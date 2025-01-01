@@ -4,18 +4,18 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'NoteTaker - Organize Your Thoughts',
-  description: 'A simple and powerful note-taking application',
+	title: 'NoteTaker - Organize Your Thoughts',
+	description: 'A simple and powerful note-taking application',
 };
 
 export default function RootLayout({
-  children,
+	children,
 }: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
-  );
+	return (
+		<html lang="en">
+			<body className={inter.className}>{children}</body>
+		</html>
+	);
 }
