@@ -7,7 +7,8 @@ import {
   UserOutlined,
   HomeOutlined,
   SettingOutlined,
-  LogoutOutlined 
+  LogoutOutlined,
+  FileTextOutlined
 } from '@ant-design/icons';
 import { useRouter, usePathname, useSelectedLayoutSegments } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -34,6 +35,15 @@ export default function DashboardNav() {
         router.push('/dashboard');
       },
       path: '/dashboard'
+    },
+    {
+      key: 'notes',
+      icon: <FileTextOutlined />,
+      label: 'Notes',
+      onClick: () => {
+        router.push('/dashboard/notes');
+      },
+      path: '/dashboard/notes'
     },
     {
       key: 'settings',
