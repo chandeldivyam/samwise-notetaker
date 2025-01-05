@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Input, Button, message, Form, Card, Spin } from 'antd';
 import { useRouter } from 'next/navigation';
 import { getNote, updateNote, deleteNote } from '@/lib/actions/notes';
@@ -8,11 +8,6 @@ import { use } from 'react';
 
 const { TextArea } = Input;
 
-interface Note {
-  id: string;
-  title: string;
-  content: string;
-}
 
 export default function EditNotePage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -25,7 +20,7 @@ export default function EditNotePage({ params }: { params: Promise<{ id: string 
     fetchNote();
   }, []);
 
-  const fetchNote = async () => {
+  const fetchNote = useCallback(async () => {
     try {
       const { data, error } = await getNote(resolvedParams.id);
       if (error) throw error;
@@ -38,7 +33,7 @@ export default function EditNotePage({ params }: { params: Promise<{ id: string 
     } finally {
       setLoading(false);
     }
-  };
+  }, [form, resolvedParams.id]);
 
   const onFinish = async (values: { title: string; content: string }) => {
     setSaving(true);

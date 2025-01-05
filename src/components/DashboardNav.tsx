@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Layout, Menu, Dropdown, Button, Space } from 'antd';
+import { Layout, Dropdown, Button } from 'antd';
 import { 
   MenuOutlined, 
   UserOutlined,
@@ -10,7 +10,7 @@ import {
   LogoutOutlined,
   FileTextOutlined
 } from '@ant-design/icons';
-import { useRouter, usePathname, useSelectedLayoutSegments } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 
 const { Header } = Layout;

@@ -18,10 +18,10 @@
 	margin-bottom: 1.5rem !important;
 }
 
-:global(.ant-tabs-nav) {
+.tabsNav {
 	margin-bottom: 24px !important;
 }
 
-:global(.ant-tabs-tab) {
+.tabItem {
 	font-size: 16px;
 }

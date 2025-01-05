@@ -15,6 +15,7 @@ import { login, signup } from './actions';
 import styles from './login.module.css';
 import { useState } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import './styles.css';
 
 const { Title } = Typography;
 type TabKey = 'login' | 'signup';
@@ -204,6 +205,7 @@ export default function LoginPage() {
 					items={items}
 					onChange={(key) => setActiveTab(key as TabKey)}
 					centered
+					className={styles.tabsNav}
 				/>
 			</Card>
 		</div>
