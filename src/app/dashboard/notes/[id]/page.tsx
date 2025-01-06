@@ -1,24 +1,31 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Input, Button, message, Form, Card, Spin } from 'antd';
+import { Input, Button, message, Form, Spin } from 'antd';
 import { useRouter } from 'next/navigation';
-import { getNote, updateNote, deleteNote } from '@/lib/actions/notes';
+import { getNote, updateNote, deleteNote, getNotes } from '@/lib/actions/notes';
 import { use } from 'react';
-
+import NotesLayout from '@/components/NotesLayout';
+import { Note } from '@/types/note';
 const { TextArea } = Input;
-
 
 export default function EditNotePage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [notes, setNotes] = useState<Note[]>([]);
   const [form] = Form.useForm();
   const router = useRouter();
 
   useEffect(() => {
     fetchNote();
+    loadNotes();
   }, []);
+
+  const loadNotes = async () => {
+    const { data } = await getNotes();
+    setNotes(data || []);
+  };
 
   const fetchNote = useCallback(async () => {
     try {
@@ -68,47 +75,52 @@ export default function EditNotePage({ params }: { params: Promise<{ id: string 
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-[calc(100vh-64px)]">
-        <Spin size="large" />
-      </div>
+      <NotesLayout notes={notes}>
+        <div className="flex justify-center items-center h-full">
+          <Spin size="large" />
+        </div>
+      </NotesLayout>
     );
   }
 
   return (
-    <div className="p-8">
-      <Card title="Edit Note" className="max-w-2xl mx-auto">
+    <NotesLayout notes={notes}>
+      <div className="p-8">
         <Form form={form} layout="vertical" onFinish={onFinish}>
           <Form.Item
             name="title"
-            label="Title"
             rules={[{ required: true, message: 'Please input the title!' }]}
           >
-            <Input placeholder="Enter note title" />
+            <Input
+              placeholder="Title"
+              variant="borderless"
+              size="large"
+              className="text-2xl font-bold px-0"
+            />
           </Form.Item>
 
           <Form.Item
             name="content"
-            label="Content"
             rules={[{ required: true, message: 'Please input the content!' }]}
           >
-            <TextArea rows={10} placeholder="Enter note content" />
+            <TextArea
+              placeholder="Start writing..."
+              variant="borderless"
+              autoSize={{ minRows: 10 }}
+              className="text-lg px-0"
+            />
           </Form.Item>
 
-          <Form.Item>
-            <div className="flex justify-between">
-              <Button danger onClick={handleDelete}>
-                Delete Note
-              </Button>
-              <div className="flex gap-2">
-                <Button onClick={() => router.back()}>Cancel</Button>
-                <Button type="primary" htmlType="submit" loading={saving}>
-                  Save Changes
-                </Button>
-              </div>
-            </div>
-          </Form.Item>
+          <div className="fixed bottom-8 right-8 flex gap-2">
+            <Button danger onClick={handleDelete}>
+              Delete
+            </Button>
+            <Button type="primary" onClick={form.submit} loading={saving}>
+              Save
+            </Button>
+          </div>
         </Form>
-      </Card>
-    </div>
+      </div>
+    </NotesLayout>
   );
 } 
