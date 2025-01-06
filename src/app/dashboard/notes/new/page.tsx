@@ -1,28 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Input, Button, message, Form } from 'antd';
 import { useRouter } from 'next/navigation';
 import { createNote, getNotes } from '@/lib/actions/notes';
 import NotesLayout from '@/components/NotesLayout';
 import { Note } from '@/types/note';
+import { useNotes } from '@/contexts/NotesContext';
 
 const { TextArea } = Input;
 
 export default function NewNotePage() {
   const [loading, setLoading] = useState(false);
-  const [notes, setNotes] = useState<Note[]>([]);
   const [form] = Form.useForm();
   const router = useRouter();
-
-  useEffect(() => {
-    loadNotes();
-  }, []);
-
-  const loadNotes = async () => {
-    const { data } = await getNotes();
-    setNotes(data || []);
-  };
+  const { refreshNotes } = useNotes();
 
   const onFinish = async (values: { title: string; content: string }) => {
     setLoading(true);
@@ -30,6 +22,7 @@ export default function NewNotePage() {
       const { error } = await createNote(values);
       if (error) throw error;
 
+      await refreshNotes();
       message.success('Note created successfully');
       router.push('/dashboard/notes');
     } catch (error) {
@@ -41,7 +34,7 @@ export default function NewNotePage() {
   };
 
   return (
-    <NotesLayout notes={notes}>
+    <NotesLayout>
       <div className="p-8">
         <Form 
           form={form}
