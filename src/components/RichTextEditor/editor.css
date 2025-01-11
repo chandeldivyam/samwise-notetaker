@@ -1,0 +1,219 @@
+.editor-container {
+	border: 1px solid var(--border-color);
+	background: var(--component-background);
+	border-radius: 4px;
+	margin-bottom: 20px;
+	position: relative;
+}
+
+.editor-inner {
+	position: relative;
+	padding: 16px;
+	background: var(--component-background);
+}
+
+.editor-input {
+	min-height: 200px;
+	resize: none;
+	font-size: 16px;
+	position: relative;
+	tab-size: 1;
+	outline: 0;
+	caret-color: var(--text-primary);
+	color: var(--text-primary);
+}
+
+.editor-placeholder {
+	color: var(--text-secondary);
+	overflow: hidden;
+	position: absolute;
+	text-overflow: ellipsis;
+	top: 16px;
+	left: 16px;
+	user-select: none;
+	white-space: nowrap;
+	display: inline-block;
+	pointer-events: none;
+}
+
+.editor-text-bold {
+	font-weight: bold;
+}
+
+.editor-text-italic {
+	font-style: italic;
+}
+
+.editor-text-underline {
+	text-decoration: underline;
+}
+
+.editor-text-strikethrough {
+	text-decoration: line-through;
+}
+
+.editor-text-underlineStrikethrough {
+	text-decoration: underline line-through;
+}
+
+.toolbar {
+	display: flex;
+	margin-bottom: 1px;
+	padding: 4px;
+	border-bottom: 1px solid var(--border-color);
+	background: var(--component-background);
+}
+
+.toolbar .ant-select {
+	margin-right: 8px;
+}
+
+.editor-paragraph {
+	margin: 0;
+	position: relative;
+	color: var(--text-primary);
+}
+
+.editor-heading-h1 {
+	font-size: 24px;
+	font-weight: bold;
+	margin: 10px 0;
+}
+
+.editor-heading-h2 {
+	font-size: 20px;
+	font-weight: bold;
+	margin: 8px 0;
+}
+
+.editor-heading-h3 {
+	font-size: 16px;
+	font-weight: bold;
+	margin: 6px 0;
+}
+
+.editor-heading-h4 {
+	font-size: 16px;
+	font-weight: bold;
+	margin: 10px 0;
+}
+
+.editor-heading-h5 {
+	font-size: 14px;
+	font-weight: bold;
+	margin: 10px 0;
+}
+
+.editor-quote {
+	margin: 8px 0;
+	padding-left: 16px;
+	border-left: 4px solid var(--border-color);
+	color: var(--text-secondary);
+}
+
+.PlaygroundEditorTheme__ol1 {
+	padding: 0;
+	margin: 0;
+	list-style-position: outside;
+	list-style-type: decimal;
+}
+.PlaygroundEditorTheme__ol2 {
+	padding: 0;
+	margin: 0;
+	list-style-type: upper-alpha;
+	list-style-position: outside;
+}
+.PlaygroundEditorTheme__ol3 {
+	padding: 0;
+	margin: 0;
+	list-style-type: lower-alpha;
+	list-style-position: outside;
+}
+.PlaygroundEditorTheme__ol4 {
+	padding: 0;
+	margin: 0;
+	list-style-type: upper-roman;
+	list-style-position: outside;
+}
+.PlaygroundEditorTheme__ol5 {
+	padding: 0;
+	margin: 0;
+	list-style-type: lower-roman;
+	list-style-position: outside;
+}
+.PlaygroundEditorTheme__ul {
+	padding: 0;
+	margin: 0;
+	list-style-position: outside;
+	list-style-type: disc;
+}
+.PlaygroundEditorTheme__listItem {
+	margin: 0 32px;
+}
+.PlaygroundEditorTheme__listItemChecked,
+.PlaygroundEditorTheme__listItemUnchecked {
+	position: relative;
+	margin-left: 8px;
+	margin-right: 8px;
+	padding-left: 24px;
+	padding-right: 24px;
+	list-style-type: none;
+	outline: none;
+}
+.PlaygroundEditorTheme__listItemChecked {
+	text-decoration: line-through;
+}
+.PlaygroundEditorTheme__listItemUnchecked:before,
+.PlaygroundEditorTheme__listItemChecked:before {
+	content: '';
+	width: 16px;
+	height: 16px;
+	top: 2px;
+	left: 0;
+	cursor: pointer;
+	display: block;
+	background-size: cover;
+	position: absolute;
+}
+.PlaygroundEditorTheme__listItemUnchecked[dir='rtl']:before,
+.PlaygroundEditorTheme__listItemChecked[dir='rtl']:before {
+	left: auto;
+	right: 0;
+}
+.PlaygroundEditorTheme__listItemUnchecked:focus:before,
+.PlaygroundEditorTheme__listItemChecked:focus:before {
+	box-shadow: 0 0 0 2px #a6cdfe;
+	border-radius: 2px;
+}
+.PlaygroundEditorTheme__listItemUnchecked:before {
+	border: 1px solid #999;
+	border-radius: 2px;
+}
+.PlaygroundEditorTheme__listItemChecked:before {
+	border: 1px solid rgb(61, 135, 245);
+	border-radius: 2px;
+	background-color: #3d87f5;
+	background-repeat: no-repeat;
+}
+.PlaygroundEditorTheme__listItemChecked:after {
+	content: '';
+	cursor: pointer;
+	border-color: #fff;
+	border-style: solid;
+	position: absolute;
+	display: block;
+	top: 6px;
+	width: 3px;
+	left: 7px;
+	right: 7px;
+	height: 6px;
+	transform: rotate(45deg);
+	border-width: 0 2px 2px 0;
+}
+.PlaygroundEditorTheme__nestedListItem {
+	list-style-type: none;
+}
+.PlaygroundEditorTheme__nestedListItem:before,
+.PlaygroundEditorTheme__nestedListItem:after {
+	display: none;
+}

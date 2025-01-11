@@ -3,9 +3,9 @@
 import { NotesProvider } from '@/contexts/NotesContext';
 
 export default function NotesLayout({
-  children,
+	children,
 }: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  return <NotesProvider>{children}</NotesProvider>;
-} 
+	return <NotesProvider>{children}</NotesProvider>;
+}

@@ -1,22 +1,218 @@
+/* src/app/globals.css */
 @import 'antd/dist/reset.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
+:root[data-theme='light'] {
 	--background: #ffffff;
 	--foreground: #171717;
+	--component-background: #ffffff;
+	--border-color: #e5e7eb;
+	--text-primary: #171717;
+	--text-secondary: #6b7280;
+	--editor-toolbar-bg: #ffffff;
+	--editor-toolbar-border: #e5e7eb;
+	--editor-button-hover: #f3f4f6;
+	--editor-selection-bg: #e5e7eb;
+	--editor-code-bg: #f3f4f6;
 }
 
-@media (prefers-color-scheme: dark) {
-	:root {
-		--background: #0a0a0a;
-		--foreground: #ededed;
-	}
+:root[data-theme='dark'] {
+	--background: #1a1a1a;
+	--foreground: #ffffff;
+	--component-background: #262626;
+	--border-color: #404040;
+	--text-primary: #ffffff;
+	--text-secondary: #a3a3a3;
+	--editor-toolbar-bg: #262626;
+	--editor-toolbar-border: #404040;
+	--editor-button-hover: #404040;
+	--editor-selection-bg: #404040;
+	--editor-code-bg: #1a1a1a;
 }
 
 body {
-	color: var(--foreground);
+	color: var(--text-primary);
 	background: var(--background);
-	font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Add these styles for dark mode compatibility */
+.ant-layout {
+	background: var(--background) !important;
+}
+
+.ant-input {
+	color: var(--text-primary) !important;
+}
+
+.ant-layout-header {
+	background: var(--component-background) !important;
+	border-color: var(--border-color) !important;
+}
+
+.ant-layout-sider {
+	background: var(--component-background) !important;
+	border-color: var(--border-color) !important;
+}
+
+.ant-btn-text {
+	color: var(--text-primary) !important;
+}
+
+.ant-typography {
+	color: var(--text-primary) !important;
+}
+
+.editor-container {
+	background: var(--component-background);
+	border-color: var(--border-color) !important;
+}
+
+.editor-input {
+	color: var(--text-primary) !important;
+}
+
+.editor-placeholder {
+	color: var(--text-secondary) !important;
+}
+
+.editor-shell {
+	background: var(--component-background);
+	color: var(--text-primary);
+}
+
+.editor-container {
+	background: var(--component-background);
+	color: var(--text-primary);
+}
+
+.ant-collapse {
+	background: var(--component-background) !important;
+}
+
+.ant-collapse-header {
+	color: var(--text-primary) !important;
+}
+
+.ant-collapse-content {
+	background: var(--component-background) !important;
+}
+
+.ant-layout-sider {
+	background: var(--component-background) !important;
+}
+
+.ant-layout-content {
+	background: var(--component-background) !important;
+}
+
+.ant-select {
+	background: var(--component-background) !important;
+}
+
+.ant-select-selector {
+	background: var(--component-background) !important;
+	color: var(--text-primary) !important;
+	border-color: var(--border-color) !important;
+}
+
+.ant-select-dropdown {
+	background: var(--component-background) !important;
+	border-color: var(--border-color) !important;
+}
+
+.ant-select-item {
+	color: var(--text-primary) !important;
+}
+
+.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+	background-color: var(--editor-button-hover) !important;
+}
+
+.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+	background-color: var(--editor-selection-bg) !important;
+}
+
+.ant-select-arrow {
+	color: var(--text-primary) !important;
+}
+
+.ant-layout-sider {
+	background: var(--component-background) !important;
+	border-color: var(--border-color) !important;
+}
+
+:root[data-theme='light'] .ant-input::placeholder {
+	color: var(--text-secondary) !important;
+}
+
+/* Dark theme placeholder */
+:root[data-theme='dark'] .ant-input::placeholder {
+	color: var(--text-secondary) !important;
+}
+
+/* For cross-browser compatibility */
+:root[data-theme='light'] .ant-input::-webkit-input-placeholder {
+	color: var(--text-secondary) !important;
+}
+
+:root[data-theme='dark'] .ant-input::-webkit-input-placeholder {
+	color: var(--text-secondary) !important;
+}
+
+:root[data-theme='light'] .ant-input::-moz-placeholder {
+	color: var(--text-secondary) !important;
+}
+
+:root[data-theme='dark'] .ant-input::-moz-placeholder {
+	color: var(--text-secondary) !important;
+}
+
+.ant-layout {
+	background: var(--background) !important;
+}
+
+.ant-layout-footer {
+	background: var(--component-background) !important;
+	border-top: 1px solid var(--border-color);
+	color: var(--text-primary) !important;
+}
+
+/* Fix for the bottom bar specifically */
+.ant-layout-sider-children {
+	background: var(--component-background) !important;
+}
+
+.ant-layout-sider-trigger {
+	background: var(--component-background) !important;
+	border: 1px solid var(--border-color) !important;
+	color: var(--text-primary) !important;
+}
+
+/* Hover state for the trigger button */
+.ant-layout-sider-trigger:hover {
+	background: var(--editor-button-hover) !important;
+}
+
+/* For the collapse icon in the trigger */
+.ant-layout-sider-trigger .anticon {
+	color: var(--text-primary) !important;
+}
+
+.ant-collapse-collapsed .ant-collapse-header {
+	padding: 8px 8px !important;
+	justify-content: center !important;
+}
+
+.ant-collapse-collapsed .ant-collapse-content {
+	padding: 0 8px !important;
+}
+
+.collapsed-panel .ant-collapse-header {
+	min-height: 32px !important;
+}
+
+.ant-collapse-collapsed .ant-collapse-expand-icon {
+	display: none !important;
 }
