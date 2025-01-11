@@ -32,7 +32,7 @@ export function NotesProvider({ children }: { children: React.ReactNode }) {
 	// Group notes by date
 	const groupedNotes = useMemo(() => {
 		return notes.reduce((groups: GroupedNotes, note) => {
-			const date = new Date(note.updated_at).toLocaleDateString('en-US', {
+			const date = new Date(note.created_at).toLocaleDateString('en-US', {
 				year: 'numeric',
 				month: 'long',
 				day: 'numeric',
