@@ -72,6 +72,11 @@
 	margin: 0;
 	position: relative;
 	color: var(--text-primary);
+	margin-bottom: 16px;
+}
+
+.editor-paragraph:not(:last-child) {
+	margin-bottom: 8px;
 }
 
 .editor-heading-h1 {
