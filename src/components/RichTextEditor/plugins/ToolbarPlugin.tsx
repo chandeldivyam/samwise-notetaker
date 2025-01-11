@@ -75,7 +75,7 @@ export default function ToolbarPlugin() {
   }, [editor]);
 
   return (
-    <div className="toolbar border-b border-gray-200 p-2">
+    <div className="toolbar">
       <Space>
         <Button
           type={canUndo ? 'text' : 'text'}

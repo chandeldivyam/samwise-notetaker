@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import '@/styles/editor.css';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
