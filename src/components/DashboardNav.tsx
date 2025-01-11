@@ -12,14 +12,17 @@ import {
 } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import { BulbOutlined, BulbFilled } from '@ant-design/icons';
 
 const { Header } = Layout;
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function DashboardNav() {
 	const router = useRouter();
 	const pathname = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const supabase = createClient();
+	const { theme, toggleTheme } = useTheme();
 
 	const handleLogout = async () => {
 		await supabase.auth.signOut();
@@ -87,7 +90,7 @@ export default function DashboardNav() {
 	}, [pathname]);
 
 	return (
-		<Header className="bg-white border-b border-gray-200 px-4 flex items-center justify-between">
+		<Header className="bg-component-background border-b border-border-color px-4 flex items-center justify-between">
 			<div className="flex items-center">
 				<Dropdown
 					menu={{ items: menuItems }}
@@ -97,16 +100,22 @@ export default function DashboardNav() {
 				>
 					<Button
 						type="text"
-						icon={<MenuOutlined style={{ color: 'white' }} />}
+						icon={<MenuOutlined className="text-text-primary" />}
 						className="mr-4"
 					/>
 				</Dropdown>
-				<span className="text-xl font-semibold text-white">
+				<span className="text-xl font-semibold text-text-primary">
 					{currentPageLabel}
 				</span>
 			</div>
 
-			<div className="flex items-center">
+			<div className="flex items-center gap-2">
+				<Button
+					type="text"
+					icon={theme === 'light' ? <BulbOutlined /> : <BulbFilled />}
+					onClick={toggleTheme}
+					className="flex items-center justify-center"
+				/>
 				<Dropdown
 					menu={{ items: userMenuItems }}
 					trigger={['click']}
@@ -114,7 +123,7 @@ export default function DashboardNav() {
 				>
 					<Button
 						type="text"
-						icon={<UserOutlined style={{ color: 'white' }} />}
+						icon={<UserOutlined className="text-text-primary" />}
 						className="flex items-center justify-center"
 					/>
 				</Dropdown>

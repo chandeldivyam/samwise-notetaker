@@ -1,11 +1,14 @@
-'use client';
-
 import { useState } from 'react';
-import { Layout, Button, Typography, Spin, Collapse } from 'antd';
-import { PlusOutlined, EditOutlined } from '@ant-design/icons';
+import { Layout, Button, Typography, Spin, Collapse, Tooltip } from 'antd';
+import {
+	PlusOutlined,
+	EditOutlined,
+	FileTextOutlined,
+} from '@ant-design/icons';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useNotes } from '@/contexts/NotesContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const { Sider, Content } = Layout;
 const { Text } = Typography;
@@ -15,10 +18,27 @@ interface NotesLayoutProps {
 	children: React.ReactNode;
 }
 
+const formatDate = (dateString: string, collapsed: boolean) => {
+	if (!collapsed) return dateString;
+
+	const date = new Date(dateString);
+	return date.toLocaleDateString('en-US', {
+		month: '2-digit',
+		day: '2-digit',
+		year: '2-digit',
+	});
+};
+
 export default function NotesLayout({ children }: NotesLayoutProps) {
 	const [collapsed, setCollapsed] = useState(false);
+	const [openPanels, setOpenPanels] = useState<string[]>([]);
 	const pathname = usePathname();
 	const { groupedNotes, loading } = useNotes();
+	const { theme } = useTheme();
+
+	const handlePanelChange = (keys: string | string[]) => {
+		setOpenPanels(typeof keys === 'string' ? [keys] : keys);
+	};
 
 	return (
 		<Layout className="min-h-[calc(100vh-64px)]">
@@ -26,16 +46,25 @@ export default function NotesLayout({ children }: NotesLayoutProps) {
 				collapsible
 				collapsed={collapsed}
 				onCollapse={setCollapsed}
-				theme="light"
 				width={300}
-				className="border-r border-gray-200"
+				theme={theme}
+				className="border-r border-border-color bg-component-background"
 			>
 				<div className="p-4">
-					<Link href="/dashboard/notes/new">
-						<Button type="primary" icon={<PlusOutlined />} block>
-							{!collapsed && 'New Note'}
-						</Button>
-					</Link>
+					<Tooltip
+						title={collapsed ? 'New Note' : ''}
+						placement="right"
+					>
+						<Link href="/dashboard/notes/new">
+							<Button
+								type="primary"
+								icon={<PlusOutlined />}
+								block
+							>
+								{!collapsed && 'New Note'}
+							</Button>
+						</Link>
+					</Tooltip>
 				</div>
 
 				{loading ? (
@@ -45,9 +74,13 @@ export default function NotesLayout({ children }: NotesLayoutProps) {
 				) : (
 					<div className="overflow-y-auto h-[calc(100vh-180px)]">
 						<Collapse
-							defaultActiveKey={Object.keys(groupedNotes)}
+							activeKey={openPanels}
+							onChange={handlePanelChange}
 							ghost
 							expandIconPosition="end"
+							className={
+								collapsed ? 'ant-collapse-collapsed' : ''
+							}
 						>
 							{Object.entries(groupedNotes)
 								.sort(
@@ -58,38 +91,78 @@ export default function NotesLayout({ children }: NotesLayoutProps) {
 								.map(([date, dateNotes]) => (
 									<Panel
 										header={
-											<Text strong className="text-sm">
-												{date}
-											</Text>
+											collapsed ? (
+												<Tooltip
+													title={date}
+													placement="right"
+												>
+													<Text
+														strong
+														className="text-xs"
+													>
+														{formatDate(
+															date,
+															collapsed
+														)}
+													</Text>
+												</Tooltip>
+											) : (
+												<Text
+													strong
+													className="text-sm"
+												>
+													{date}
+												</Text>
+											)
 										}
 										key={date}
+										className={
+											collapsed ? 'collapsed-panel' : ''
+										}
 									>
 										{dateNotes.map((note) => (
-											<Link
+											<Tooltip
 												key={note.id}
-												href={`/dashboard/notes/${note.id}`}
+												title={
+													collapsed
+														? note.title ||
+															'Untitled'
+														: ''
+												}
+												placement="right"
 											>
-												<div
-													className={`
-                            px-4 py-2 mb-1 cursor-pointer
-                            hover:bg-gray-100 rounded-md
-                            transition-colors duration-200
-                            flex items-center gap-2
-                            ${pathname === `/dashboard/notes/${note.id}` ? 'bg-gray-100' : ''}
-                          `}
+												<Link
+													href={`/dashboard/notes/${note.id}`}
 												>
-													<EditOutlined className="text-gray-400" />
-													<Text
+													<div
 														className={`
-                              truncate flex-1
-                              ${pathname === `/dashboard/notes/${note.id}` ? 'font-medium' : ''}
+                              px-2 py-2 mb-1 cursor-pointer
+                              hover:bg-editor-button-hover rounded-md
+                              transition-colors duration-200
+                              flex items-center gap-2
+                              ${pathname === `/dashboard/notes/${note.id}` ? 'bg-editor-button-hover' : ''}
+                              ${collapsed ? 'justify-center' : ''}
                             `}
 													>
-														{note.title ||
-															'Untitled'}
-													</Text>
-												</div>
-											</Link>
+														{collapsed ? (
+															<FileTextOutlined className="text-text-secondary" />
+														) : (
+															<>
+																<EditOutlined className="text-text-secondary" />
+																<Text
+																	className={`
+                                    truncate flex-1
+                                    ${pathname === `/dashboard/notes/${note.id}` ? 'font-medium' : ''}
+                                  `}
+																>
+																	{note.title ||
+																		'Untitled'}
+																</Text>
+															</>
+														)}
+													</div>
+												</Link>
+											</Tooltip>
 										))}
 									</Panel>
 								))}
@@ -97,7 +170,7 @@ export default function NotesLayout({ children }: NotesLayoutProps) {
 					</div>
 				)}
 			</Sider>
-			<Content className="bg-white">{children}</Content>
+			<Content className="bg-component-background">{children}</Content>
 		</Layout>
 	);
 }

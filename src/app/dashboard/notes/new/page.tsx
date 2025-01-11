@@ -33,7 +33,7 @@ export default function NewNotePage() {
 
 	return (
 		<NotesLayout>
-			<div className="p-8">
+			<div className="p-8 bg-component-background">
 				<Form form={form} layout="vertical" onFinish={onFinish}>
 					<Form.Item
 						name="title"
@@ -48,7 +48,7 @@ export default function NewNotePage() {
 							placeholder="Title"
 							variant="borderless"
 							size="large"
-							className="text-2xl font-bold px-0"
+							className="text-2xl font-bold px-0 text-text-primary"
 						/>
 					</Form.Item>
 
