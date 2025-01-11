@@ -7,6 +7,7 @@ import { createNote, getNotes } from '@/lib/actions/notes';
 import NotesLayout from '@/components/NotesLayout';
 import { Note } from '@/types/note';
 import { useNotes } from '@/contexts/NotesContext';
+import RichTextEditor from '@/components/RichTextEditor';
 
 const { TextArea } = Input;
 
@@ -57,11 +58,8 @@ export default function NewNotePage() {
             name="content"
             rules={[{ required: true, message: 'Please input the content!' }]}
           >
-            <TextArea
+            <RichTextEditor 
               placeholder="Start writing..."
-              variant="borderless"
-              autoSize={{ minRows: 10 }}
-              className="text-lg px-0"
             />
           </Form.Item>
 

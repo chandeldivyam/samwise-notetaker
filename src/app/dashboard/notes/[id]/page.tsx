@@ -8,6 +8,7 @@ import { use } from 'react';
 import NotesLayout from '@/components/NotesLayout';
 import { Note } from '@/types/note';
 import { useNotes } from '@/contexts/NotesContext';
+import RichTextEditor from '@/components/RichTextEditor';
 const { TextArea } = Input;
 
 export default function EditNotePage({ params }: { params: Promise<{ id: string }> }) {
@@ -108,11 +109,8 @@ export default function EditNotePage({ params }: { params: Promise<{ id: string 
             name="content"
             rules={[{ required: true, message: 'Please input the content!' }]}
           >
-            <TextArea
+            <RichTextEditor 
               placeholder="Start writing..."
-              variant="borderless"
-              autoSize={{ minRows: 10 }}
-              className="text-lg px-0"
             />
           </Form.Item>
 
