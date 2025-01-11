@@ -66,9 +66,23 @@ export default function DashboardNav() {
 	];
 
 	const currentPageLabel = useMemo(() => {
-		const currentMenuItem = menuItems.find(
-			(item) => pathname === item.path
-		);
+		const currentMenuItem = menuItems.find((item) => {
+			// Check if the pathname exactly matches the menu item's path
+			return pathname === item.path;
+		});
+
+		// If no exact match, find the menu item with the longest matching path
+		if (!currentMenuItem) {
+			const matchingMenuItems = menuItems.filter((item) =>
+				pathname.startsWith(item.path)
+			);
+			if (matchingMenuItems.length > 0) {
+				return matchingMenuItems.reduce((prev, curr) =>
+					prev.path.length > curr.path.length ? prev : curr
+				).label;
+			}
+		}
+
 		return currentMenuItem?.label || 'Dashboard';
 	}, [pathname]);
 
