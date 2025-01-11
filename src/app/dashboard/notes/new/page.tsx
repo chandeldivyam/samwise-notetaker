@@ -33,47 +33,50 @@ export default function NewNotePage() {
 
 	return (
 		<NotesLayout>
-			<div className="p-8 bg-component-background">
-				<Form form={form} layout="vertical" onFinish={onFinish}>
-					<Form.Item
-						name="title"
-						rules={[
-							{
-								required: true,
-								message: 'Please input the title!',
-							},
-						]}
-					>
-						<Input
-							placeholder="Title"
-							variant="borderless"
-							size="large"
-							className="text-2xl font-bold px-0 text-text-primary"
-						/>
-					</Form.Item>
-
-					<Form.Item
-						name="content"
-						rules={[
-							{
-								required: true,
-								message: 'Please input the content!',
-							},
-						]}
-					>
-						<RichTextEditor placeholder="Start writing..." />
-					</Form.Item>
-
-					<div className="fixed bottom-8 right-8">
-						<Button
-							type="primary"
-							onClick={form.submit}
-							loading={loading}
+			<div className="flex flex-col h-[calc(100vh-48px)] bg-component-background">
+				<div className="flex-1 overflow-y-auto p-8">
+					<Form form={form} layout="vertical" onFinish={onFinish}>
+						<Form.Item
+							name="title"
+							rules={[
+								{
+									required: true,
+									message: 'Please input the title!',
+								},
+							]}
 						>
-							Create
-						</Button>
-					</div>
-				</Form>
+							<Input
+								placeholder="Title"
+								variant="borderless"
+								size="large"
+								className="text-2xl font-bold px-0 text-text-primary"
+							/>
+						</Form.Item>
+
+						<Form.Item
+							name="content"
+							rules={[
+								{
+									required: true,
+									message: 'Please input the content!',
+								},
+							]}
+						>
+							<RichTextEditor placeholder="Start writing..." />
+						</Form.Item>
+					</Form>
+				</div>
+
+				<div className="sticky bottom-0 p-4 border-t border-border-color bg-component-background flex justify-end">
+    <Button
+        type="primary"
+        onClick={form.submit}
+        loading={loading}
+        className="w-full max-w-[200px]" // Add max-width and remove block prop
+    >
+        Create
+    </Button>
+</div>
 			</div>
 		</NotesLayout>
 	);

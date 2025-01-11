@@ -4,16 +4,22 @@
 	border-radius: 4px;
 	margin-bottom: 20px;
 	position: relative;
+	max-height: calc(100vh - 250px); /* Adjust this value based on your needs */
+	display: flex;
+	flex-direction: column;
 }
 
 .editor-inner {
 	position: relative;
 	padding: 16px;
 	background: var(--component-background);
+	flex: 1;
+	overflow-y: auto;
 }
 
 .editor-input {
 	min-height: 200px;
+	height: 100%;
 	resize: none;
 	font-size: 16px;
 	position: relative;
@@ -58,10 +64,23 @@
 
 .toolbar {
 	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
 	margin-bottom: 1px;
 	padding: 4px;
 	border-bottom: 1px solid var(--border-color);
 	background: var(--component-background);
+}
+
+@media (max-width: 768px) {
+	.toolbar .ant-btn {
+		padding: 4px 8px;
+		height: 32px;
+	}
+
+	.toolbar {
+		padding: 4px;
+	}
 }
 
 .toolbar .ant-select {
