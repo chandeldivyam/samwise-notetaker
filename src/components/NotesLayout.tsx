@@ -68,7 +68,7 @@ export default function NotesLayout({ children }: NotesLayoutProps) {
 				</div>
 
 				{loading ? (
-					<div className="flex justify-center p-4">
+					<div className="flex justify-center p-4 h-[calc(100vh-180px)]">
 						<Spin />
 					</div>
 				) : (
