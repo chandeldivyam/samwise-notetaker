@@ -5,16 +5,14 @@ import DashboardNav from '@/components/DashboardNav';
 import DashboardLoading from '@/components/DashboardLoading';
 
 export default function DashboardLayout({
-  children,
+	children,
 }: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  return (
-    <div className="min-h-screen">
-      <DashboardNav />
-      <Suspense fallback={<DashboardLoading />}>
-        {children}
-      </Suspense>
-    </div>
-  );
-} 
+	return (
+		<div className="min-h-screen">
+			<DashboardNav />
+			<Suspense fallback={<DashboardLoading />}>{children}</Suspense>
+		</div>
+	);
+}
