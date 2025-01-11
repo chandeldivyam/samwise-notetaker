@@ -14,13 +14,13 @@ export default function Home() {
 	};
 
 	return (
-		<div className="min-h-screen bg-white p-8">
+		<div className="min-h-screen bg-component-background p-8">
 			<Row justify="center" align="middle" className="min-h-screen">
 				<Col xs={24} sm={20} md={16} lg={12} className="text-center">
 					<Space direction="vertical" size="large" className="w-full">
 						<Title level={1}>Welcome to NoteTaker</Title>
 
-						<Paragraph className="text-lg">
+						<Paragraph className="text-lg text-text-secondary">
 							A simple and powerful note-taking application that
 							helps you organize your thoughts, ideas, and tasks
 							in one place. Start writing and organizing your

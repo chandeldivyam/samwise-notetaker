@@ -4,4 +4,25 @@
 
 .ant-tabs-tab {
 	font-size: 16px;
+	color: var(--text-secondary) !important;
+}
+
+.ant-tabs-tab-active {
+	color: var(--text-primary) !important;
+}
+
+.ant-tabs-ink-bar {
+	background: var(--text-primary) !important;
+}
+
+.ant-input-prefix {
+	color: var(--text-secondary) !important;
+}
+
+.ant-form-item-label > label {
+	color: var(--text-primary) !important;
+}
+
+.ant-form-item-explain-error {
+	color: #ff4d4f !important;
 }

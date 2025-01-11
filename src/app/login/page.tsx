@@ -9,12 +9,15 @@ import {
 	Typography,
 	Tabs,
 	message,
+	ConfigProvider,
+	theme as antTheme,
 } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { login, signup } from './actions';
 import styles from './login.module.css';
 import { useState } from 'react';
 import LoadingSpinner from '@/components/LoadingSpinner';
+import { useTheme } from '@/contexts/ThemeContext';
 import './styles.css';
 
 const { Title } = Typography;
@@ -27,6 +30,7 @@ export default function LoginPage() {
 	const [isSignupLoading, setIsSignupLoading] = useState(false);
 	const [activeTab, setActiveTab] = useState<TabKey>('login');
 	const [messageApi, contextHolder] = message.useMessage();
+	const { theme } = useTheme();
 
 	const handleLogin = async () => {
 		try {
@@ -41,7 +45,6 @@ export default function LoginPage() {
 				});
 			}
 		} catch (error) {
-			// This is for form validation errors
 			console.error('Login failed:', error);
 		} finally {
 			setIsLoginLoading(false);
@@ -67,7 +70,6 @@ export default function LoginPage() {
 				});
 			}
 		} catch (error) {
-			// This is for form validation errors
 			console.error('Signup failed:', error);
 		} finally {
 			setIsSignupLoading(false);
@@ -92,6 +94,10 @@ export default function LoginPage() {
 					prefix={<UserOutlined />}
 					placeholder="Email"
 					type="email"
+					style={{
+						background: 'var(--component-background)',
+						borderColor: 'var(--border-color)',
+					}}
 				/>
 			</Form.Item>
 
@@ -108,6 +114,10 @@ export default function LoginPage() {
 				<Input.Password
 					prefix={<LockOutlined />}
 					placeholder="Password"
+					style={{
+						background: 'var(--component-background)',
+						borderColor: 'var(--border-color)',
+					}}
 				/>
 			</Form.Item>
 
@@ -149,6 +159,10 @@ export default function LoginPage() {
 					prefix={<UserOutlined />}
 					placeholder="Email"
 					type="email"
+					style={{
+						background: 'var(--component-background)',
+						borderColor: 'var(--border-color)',
+					}}
 				/>
 			</Form.Item>
 
@@ -165,6 +179,10 @@ export default function LoginPage() {
 				<Input.Password
 					prefix={<LockOutlined />}
 					placeholder="Password"
+					style={{
+						background: 'var(--component-background)',
+						borderColor: 'var(--border-color)',
+					}}
 				/>
 			</Form.Item>
 
@@ -194,20 +212,49 @@ export default function LoginPage() {
 	];
 
 	return (
-		<div className={styles.container}>
-			{contextHolder}
-			<Card className={styles.loginCard}>
-				<Title level={2} className={styles.title}>
-					Welcome to Samwise
-				</Title>
-				<Tabs
-					activeKey={activeTab}
-					items={items}
-					onChange={(key) => setActiveTab(key as TabKey)}
-					centered
-					className={styles.tabsNav}
-				/>
-			</Card>
-		</div>
+		<ConfigProvider
+			theme={{
+				algorithm:
+					theme === 'dark'
+						? antTheme.darkAlgorithm
+						: antTheme.defaultAlgorithm,
+				components: {
+					Tabs: {
+						itemHoverColor: 'var(--text-primary)',
+						itemSelectedColor: 'var(--text-primary)',
+						inkBarColor: 'var(--text-primary)',
+					},
+					Card: {
+						colorBgContainer: 'var(--component-background)',
+						colorBorderSecondary: 'var(--border-color)',
+					},
+					Input: {
+						colorBgContainer: 'var(--component-background)',
+						colorBorder: 'var(--border-color)',
+						colorText: 'var(--text-primary)',
+						colorTextPlaceholder: 'var(--text-secondary)',
+					},
+					Button: {
+						primaryColor: 'var(--text-primary)',
+					},
+				},
+			}}
+		>
+			<div className={styles.container}>
+				{contextHolder}
+				<Card className={styles.loginCard}>
+					<Title level={2} className={styles.title}>
+						Welcome to Samwise
+					</Title>
+					<Tabs
+						activeKey={activeTab}
+						items={items}
+						onChange={(key) => setActiveTab(key as TabKey)}
+						centered
+						className={styles.tabsNav}
+					/>
+				</Card>
+			</div>
+		</ConfigProvider>
 	);
 }
