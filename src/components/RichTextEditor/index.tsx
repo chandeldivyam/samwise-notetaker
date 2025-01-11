@@ -11,6 +11,8 @@ import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import ToolbarPlugin from './plugins/ToolbarPlugin';
 import { editorConfig } from './config';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
+import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
+import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
 
 interface RichTextEditorProps {
 	content?: string;
@@ -50,6 +52,8 @@ export default function RichTextEditor({
 						ErrorBoundary={LexicalErrorBoundary}
 					/>
 					<ListPlugin />
+					<MarkdownShortcutPlugin />
+					<TabIndentationPlugin />
 					<OnChangePlugin
 						onChange={(editorState) => {
 							if (onChange) {

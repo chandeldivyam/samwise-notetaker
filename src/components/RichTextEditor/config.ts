@@ -4,6 +4,8 @@ import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { LinkNode } from '@lexical/link';
 import { ParagraphNode, TextNode } from 'lexical';
+import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
+import { CodeNode, CodeHighlightNode } from '@lexical/code';
 
 export const editorConfig: InitialConfigType = {
 	namespace: 'NotesEditor',
@@ -16,6 +18,9 @@ export const editorConfig: InitialConfigType = {
 		LinkNode,
 		ParagraphNode,
 		TextNode,
+		HorizontalRuleNode,
+		CodeNode,
+		CodeHighlightNode,
 	],
 	onError: (error: Error) => {
 		console.error(error);
