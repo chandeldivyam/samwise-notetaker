@@ -54,13 +54,14 @@
 }
 
 .toolbar {
-  border-bottom: 1px solid #eee;
-  padding: 8px;
-  margin-bottom: 8px;
+  display: flex;
+  margin-bottom: 1px;
+  padding: 4px;
+  border-bottom: 1px solid #ccc;
 }
 
-.toolbar button {
-  margin-right: 4px;
+.toolbar .ant-select {
+  margin-right: 8px;
 }
 
 .editor-paragraph {
@@ -77,13 +78,13 @@
 .editor-heading-h2 {
   font-size: 20px;
   font-weight: bold;
-  margin: 10px 0;
+  margin: 8px 0;
 }
 
 .editor-heading-h3 {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
-  margin: 10px 0;
+  margin: 6px 0;
 }
 
 .editor-heading-h4 {
@@ -103,4 +104,14 @@
   padding-left: 16px;
   border-left: 4px solid #ccc;
   color: #666;
+}
+
+.editor-container ul {
+  padding-left: 20px;
+  list-style-type: disc;
+}
+
+.editor-container ol {
+  padding-left: 20px;
+  list-style-type: decimal;
 } 

@@ -20,4 +20,13 @@ export const editorConfig: InitialConfigType = {
   onError: (error: Error) => {
     console.error(error);
   },
-}; 
+};
+
+export const BLOCK_TYPE_TO_BLOCKTYPE = {
+  'paragraph': 'Paragraph',
+  'h1': 'Heading 1',
+  'h2': 'Heading 2',
+  'h3': 'Heading 3',
+  'bullet': 'Bullet List',
+  'number': 'Numbered List'
+} as const; 

@@ -11,8 +11,16 @@ import {
   CAN_UNDO_COMMAND,
   CAN_REDO_COMMAND,
 } from 'lexical';
+import { $createParagraphNode, $getNodeByKey } from 'lexical';
+import { $createHeadingNode } from '@lexical/rich-text';
+import { $setBlocksType } from '@lexical/selection';
+import {
+  INSERT_ORDERED_LIST_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND,
+  REMOVE_LIST_COMMAND,
+} from '@lexical/list';
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Space } from 'antd';
+import { Button, Space, Select } from 'antd';
 import {
   BoldOutlined,
   ItalicOutlined,
@@ -24,9 +32,11 @@ import {
   AlignCenterOutlined,
   AlignRightOutlined,
 } from '@ant-design/icons';
+import { BLOCK_TYPE_TO_BLOCKTYPE } from '../config';
 
 export default function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
+  const [blockType, setBlockType] = useState<string>('paragraph');
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
@@ -41,8 +51,58 @@ export default function ToolbarPlugin() {
       setIsItalic(selection.hasFormat('italic'));
       setIsUnderline(selection.hasFormat('underline'));
       setIsStrikethrough(selection.hasFormat('strikethrough'));
+      
+      // Get selected block type
+      const anchorNode = selection.anchor.getNode();
+      const element = anchorNode.getKey() === 'root' 
+        ? anchorNode 
+        : anchorNode.getTopLevelElement();
+      
+      if (element) {
+        const elementKey = element.getKey();
+        const elementDOM = editor.getElementByKey(elementKey);
+        
+        if (elementDOM) {
+          if (elementDOM.tagName === 'P') {
+            setBlockType('paragraph');
+          } else if (elementDOM.tagName === 'H1') {
+            setBlockType('h1');
+          } else if (elementDOM.tagName === 'H2') {
+            setBlockType('h2');
+          } else if (elementDOM.tagName === 'H3') {
+            setBlockType('h3');
+          } else if (elementDOM.tagName === 'UL') {
+            setBlockType('bullet');
+          } else if (elementDOM.tagName === 'OL') {
+            setBlockType('number');
+          }
+        }
+      }
     }
-  }, []);
+  }, [editor]);
+
+  const formatBlock = (blockType: string) => {
+    editor.update(() => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        switch (blockType) {
+          case 'h1':
+          case 'h2':
+          case 'h3':
+            $setBlocksType(selection, () => $createHeadingNode(blockType));
+            break;
+          case 'bullet':
+            editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
+            break;
+          case 'number':
+            editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
+            break;
+          default:
+            $setBlocksType(selection, () => $createParagraphNode());
+        }
+      }
+    });
+  };
 
   useEffect(() => {
     return editor.registerUpdateListener(({ editorState }) => {
@@ -77,6 +137,18 @@ export default function ToolbarPlugin() {
   return (
     <div className="toolbar">
       <Space>
+        <Select
+          value={blockType}
+          style={{ width: 160 }}
+          onChange={(value) => {
+            setBlockType(value);
+            formatBlock(value);
+          }}
+          options={Object.entries(BLOCK_TYPE_TO_BLOCKTYPE).map(([value, label]) => ({
+            value,
+            label
+          }))}
+        />
         <Button
           type={canUndo ? 'text' : 'text'}
           disabled={!canUndo}
