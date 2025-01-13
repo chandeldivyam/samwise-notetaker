@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { Upload, Form, Input, Button, message, Typography } from 'antd';
+import { useState, useEffect } from 'react';
+import { Upload, Form, Input, Button, Typography } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { createRecording } from '@/lib/actions/recordings';
 import { uploadToS3, generateS3Key } from '@/utils/s3';
 import { createClient } from '@/utils/supabase/client';
+import { useMessage, showSuccess, showError } from '@/utils/message';
 
 const { Title } = Typography;
 const { Dragger } = Upload;
@@ -16,35 +17,56 @@ export default function NewRecordingPage() {
   const router = useRouter();
   const [uploading, setUploading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
+  const messageApi = useMessage();
 
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (uploading) {
+        e.preventDefault();
+        return (e.returnValue = '');
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [uploading]);
+
+  // Updated beforeUpload to allow only mp3 (audio/mpeg | audio/mp3) and mp4 (video/mp4)
   const beforeUpload = (file: File) => {
-    const isAudioOrVideo = file.type.startsWith('audio/') || file.type.startsWith('video/');
-    const isValidFormat = ['audio/mpeg', 'audio/mp3', 'video/mp4'].includes(file.type);
-    
-    if (!isAudioOrVideo || !isValidFormat) {
-      message.error('You can only upload MP3 or MP4 files!');
+    const isValidFormat =
+      file.type === 'audio/mpeg' ||
+      file.type === 'audio/mp3' ||
+      file.type === 'video/mp4';
+
+    if (!isValidFormat) {
+      showError(messageApi, 'You can only upload MP3 or MP4 files!');
       return false;
     }
 
-    const isLessThan100MB = file.size / 1024 / 1024 < 100;
+    // Check file size (< 1000MB)
+    const isLessThan100MB = file.size / 1024 / 1024 < 1000;
     if (!isLessThan100MB) {
-      message.error('File must be smaller than 100MB!');
+      showError(messageApi, 'File must be smaller than 1000MB!');
       return false;
     }
 
     setFile(file);
+    // Returning false so antd doesn’t auto-upload
     return false;
   };
 
   const onFinish = async (values: { title: string; description?: string }) => {
     if (!file) {
-      message.error('Please select a file to upload');
+      showError(messageApi, 'Please select a file to upload');
       return;
     }
     const supabase = await createClient();
     const { data: user } = await supabase.auth.getUser();
     if (!user) {
-      message.error('User not authenticated');
+      showError(messageApi, 'User not authenticated');
       return;
     }
 
@@ -54,9 +76,9 @@ export default function NewRecordingPage() {
       if (!userId) throw new Error('User ID not found');
       const s3Key = await generateS3Key(userId, file.type);
       const { error: uploadError } = await uploadToS3(file, s3Key);
-      
+
       if (uploadError) throw new Error(uploadError);
-  
+
       const { error } = await createRecording({
         title: values.title,
         description: values.description,
@@ -65,19 +87,22 @@ export default function NewRecordingPage() {
         file_type: file.type,
         file_size: file.size,
       });
-  
-      if (error) throw new Error(error);
-  
-      message.success('Recording uploaded successfully');
+
+      if (error) {
+        showError(messageApi, 'Failed to upload recording');
+        console.error('Error:', error);
+        throw new Error(error);
+      }
+
+      showSuccess(messageApi, 'Recording uploaded successfully');
       router.push('/dashboard/recordings');
     } catch (error) {
       console.error('Error:', error);
-      message.error('Failed to upload recording');
+      showError(messageApi, 'Failed to upload recording');
     } finally {
       setUploading(false);
     }
   };
-  
 
   return (
     <div className="min-h-[calc(100vh-48px)] bg-component-background">
@@ -85,7 +110,7 @@ export default function NewRecordingPage() {
         <Title level={2} className="mb-8 text-text-primary">
           Upload New Recording
         </Title>
-        
+
         <Form
           form={form}
           layout="vertical"
@@ -97,7 +122,7 @@ export default function NewRecordingPage() {
             label="Title"
             rules={[{ required: true, message: 'Please enter a title' }]}
           >
-            <Input 
+            <Input
               placeholder="Enter recording title"
               className="border-border-color hover:border-text-primary focus:border-text-primary"
             />
@@ -107,22 +132,26 @@ export default function NewRecordingPage() {
             name="description"
             label="Description"
           >
-            <Input.TextArea 
-              placeholder="Enter recording description (optional)" 
+            <Input.TextArea
+              placeholder="Enter recording description (optional)"
               rows={4}
               className="border-border-color hover:border-text-primary focus:border-text-primary"
             />
           </Form.Item>
 
-          <Form.Item 
-            label="Recording File" 
+          <Form.Item
+            label="Recording File"
             required
             className="border-border-color"
           >
             <Dragger
-              beforeUpload={beforeUpload}
+              // Only accept .mp3 and .mp4
+              accept=".mp3,.mp4"
+              // Ensure only one file is allowed
+              multiple={false}
               maxCount={1}
               showUploadList={true}
+              beforeUpload={beforeUpload}
               className="bg-component-background border-2 border-dashed border-border-color hover:border-text-primary"
             >
               <p className="ant-upload-drag-icon">
