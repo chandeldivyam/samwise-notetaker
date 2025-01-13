@@ -49,6 +49,7 @@ export default function NotesLayout({ children }: NotesLayoutProps) {
 				width={300}
 				theme={theme}
 				className="border-r border-border-color bg-component-background"
+				suppressHydrationWarning
 			>
 				<div className="p-4">
 					<Tooltip

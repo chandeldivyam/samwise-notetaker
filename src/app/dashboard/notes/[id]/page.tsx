@@ -7,6 +7,17 @@ import { use } from 'react';
 import NotesLayout from '@/components/NotesLayout';
 import { useNotes } from '@/contexts/NotesContext';
 import RichTextEditor from '@/components/RichTextEditor';
+import { Note } from '@/types/note';
+
+interface FormValues {
+	title: string;
+	content: string;
+}
+
+interface ChangedValues {
+	title?: string;
+	content?: string;
+}
 
 export default function EditNotePage({
 	params,
@@ -16,14 +27,29 @@ export default function EditNotePage({
 	const resolvedParams = use(params);
 	const [loading, setLoading] = useState(true);
 	const [saving, setSaving] = useState(false);
-	const [form] = Form.useForm();
+	const [form] = Form.useForm<FormValues>();
 	const router = useRouter();
 	const { refreshNotes } = useNotes();
 	const [deleting, setDeleting] = useState(false);
+	const [initialValues, setInitialValues] = useState<Note | null>(null);
+	const [isDirty, setIsDirty] = useState(false);
 
 	useEffect(() => {
 		fetchNote();
-	}, []);
+		const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+			if (isDirty) {
+				event.preventDefault();
+				event.returnValue =
+					'You have unsaved changes. Are you sure you want to leave?';
+				return 'You have unsaved changes. Are you sure you want to leave?';
+			}
+		};
+		window.addEventListener('beforeunload', handleBeforeUnload);
+
+		return () => {
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+		};
+	}, [isDirty]);
 
 	const fetchNote = useCallback(async () => {
 		try {
@@ -35,6 +61,7 @@ export default function EditNotePage({
 				return;
 			}
 			form.setFieldsValue(data);
+			setInitialValues(data);
 		} catch (error) {
 			message.error('Failed to fetch note');
 			console.error('Error:', error);
@@ -44,7 +71,7 @@ export default function EditNotePage({
 		}
 	}, [form, resolvedParams.id, router]);
 
-	const onFinish = async (values: { title: string; content: string }) => {
+	const onFinish = async (values: FormValues) => {
 		setSaving(true);
 		try {
 			const { error } = await updateNote(resolvedParams.id, values);
@@ -52,6 +79,7 @@ export default function EditNotePage({
 			await refreshNotes();
 			message.success('Note updated successfully');
 			router.push('/dashboard/notes');
+			setIsDirty(false); // Reset dirty state after saving
 		} catch (error) {
 			message.error('Failed to update note');
 			console.error('Error:', error);
@@ -77,6 +105,21 @@ export default function EditNotePage({
 		}
 	};
 
+	const onValuesChange = (
+		changedValues: ChangedValues,
+		allValues: FormValues
+	) => {
+		if (!initialValues) {
+			setIsDirty(false);
+			return;
+		}
+		const hasChanges =
+			initialValues.title !== allValues.title ||
+			initialValues.content !== allValues.content;
+
+		setIsDirty(hasChanges);
+	};
+
 	if (loading) {
 		return (
 			<NotesLayout>
@@ -91,7 +134,12 @@ export default function EditNotePage({
 		<NotesLayout>
 			<div className="flex flex-col h-[calc(100vh-64px)] bg-component-background">
 				<div className="flex-1 overflow-y-auto p-4 md:p-8">
-					<Form form={form} layout="vertical" onFinish={onFinish}>
+					<Form
+						form={form}
+						layout="vertical"
+						onFinish={onFinish}
+						onValuesChange={onValuesChange}
+					>
 						<Form.Item
 							name="title"
 							rules={[
@@ -138,7 +186,7 @@ export default function EditNotePage({
 							type="primary"
 							onClick={form.submit}
 							loading={saving}
-							disabled={deleting}
+							disabled={!isDirty || deleting}
 							block={window.innerWidth < 640}
 							className="w-full max-w-[200px]"
 						>

@@ -220,109 +220,112 @@ body {
 .ant-upload-drag {
 	background: var(--component-background) !important;
 	border-color: var(--border-color) !important;
-  }
-  
-  .ant-upload-drag:hover {
-	border-color: var(--text-primary) !important;
-  }
-  
-  .ant-upload-drag-icon .anticon {
-	color: var(--text-primary) !important;
-  }
-  
-  .ant-upload-text {
-	color: var(--text-primary) !important;
-  }
-  
-  .ant-upload-hint {
-	color: var(--text-secondary) !important;
-  }
-  
-  .ant-form-item-label > label {
-	color: var(--text-primary) !important;
-  }
-  
-  .ant-input-textarea {
-	background: var(--component-background) !important;
-	border-color: var(--border-color) !important;
-  }
-  
-  .ant-input-textarea textarea {
-	background: var(--component-background) !important;
-	color: var(--text-primary) !important;
-  }
-  
-  .ant-upload-list {
-	color: var(--text-primary) !important;
-  }
-  
-  .ant-upload-list-item {
-	border-color: var(--border-color) !important;
-	background: var(--component-background) !important;
-  }
-  
-  .ant-upload-list-item-name {
-	color: var(--text-primary) !important;
-  }
+}
 
-  .ant-btn-primary {
-	color: #ffffff !important; 
-  }
-  
-  /* Additional styles to ensure proper button styling in both themes */
-  .ant-btn {
+.ant-upload-drag:hover {
+	border-color: var(--text-primary) !important;
+}
+
+.ant-upload-drag-icon .anticon {
+	color: var(--text-primary) !important;
+}
+
+.ant-upload-text {
+	color: var(--text-primary) !important;
+}
+
+.ant-upload-hint {
+	color: var(--text-secondary) !important;
+}
+
+.ant-form-item-label > label {
+	color: var(--text-primary) !important;
+}
+
+.ant-input-textarea {
+	background: var(--component-background) !important;
+	border-color: var(--border-color) !important;
+}
+
+.ant-input-textarea textarea {
+	background: var(--component-background) !important;
+	color: var(--text-primary) !important;
+}
+
+.ant-upload-list {
+	color: var(--text-primary) !important;
+}
+
+.ant-upload-list-item {
+	border-color: var(--border-color) !important;
+	background: var(--component-background) !important;
+}
+
+.ant-upload-list-item-name {
+	color: var(--text-primary) !important;
+}
+
+.ant-btn-primary {
+	color: #ffffff !important;
+}
+
+/* Additional styles to ensure proper button styling in both themes */
+.ant-btn {
 	background: var(--component-background) !important;
 	border-color: var(--border-color) !important;
 	color: var(--text-primary) !important;
-  }
-  
-  .ant-btn-primary {
-	background: #1677ff !important; /* or your primary color */
+}
+
+.ant-btn.ant-btn-primary {
+	background: #1677ff !important;
 	border-color: #1677ff !important;
-  }
-  
-  .ant-btn-primary:hover {
-	background: #4096ff !important; /* or your primary hover color */
+	color: #ffffff !important;
+}
+
+.ant-btn.ant-btn-primary:hover {
+	background: #4096ff !important;
 	border-color: #4096ff !important;
-  }
-  
-  .ant-btn:hover {
+	color: #ffffff !important;
+}
+
+.ant-btn:hover {
 	border-color: var(--text-primary) !important;
-  }
-  
-  /* For disabled state */
-  .ant-btn-primary[disabled],
-  .ant-btn-primary[disabled]:hover {
+}
+
+/* For disabled state */
+.ant-btn.ant-btn-primary[disabled],
+.ant-btn.ant-btn-primary[disabled]:hover {
 	background: rgba(0, 0, 0, 0.04) !important;
 	border-color: var(--border-color) !important;
 	color: rgba(0, 0, 0, 0.25) !important;
-  }
-  
-  :root[data-theme='dark'] .ant-btn-primary[disabled],
-  :root[data-theme='dark'] .ant-btn-primary[disabled]:hover {
+}
+
+/* Dark theme disabled state */
+:root[data-theme='dark'] .ant-btn.ant-btn-primary[disabled],
+:root[data-theme='dark'] .ant-btn.ant-btn-primary[disabled]:hover {
 	background: rgba(255, 255, 255, 0.08) !important;
 	border-color: var(--border-color) !important;
 	color: rgba(255, 255, 255, 0.25) !important;
-  }
-  :root[data-theme='dark'] .ant-input,
+}
+:root[data-theme='dark'] .ant-input,
 :root[data-theme='dark'] .ant-input-textarea,
 :root[data-theme='dark'] .ant-input-affix-wrapper,
 :root[data-theme='dark'] .ant-input-group-addon {
-  background: var(--component-background) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border-color) !important;
+	background: var(--component-background) !important;
+	color: var(--text-primary) !important;
+	border-color: var(--border-color) !important;
 }
 
 /* Placeholder color for dark mode */
 :root[data-theme='dark'] .ant-input::placeholder,
 :root[data-theme='dark'] .ant-input-textarea::placeholder {
-  color: var(--text-secondary) !important;
+	color: var(--text-secondary) !important;
 }
 
 /* Textarea specific styles */
 :root[data-theme='dark'] .ant-input-textarea textarea {
-  background: var(--component-background) !important;
-  color: var(--text-primary) !important;
+	background: var(--component-background) !important;
+	color: var(--text-primary) !important;
 }
 
 /* Input hover and focus states */
@@ -330,14 +333,14 @@ body {
 :root[data-theme='dark'] .ant-input:focus,
 :root[data-theme='dark'] .ant-input-textarea:hover,
 :root[data-theme='dark'] .ant-input-textarea:focus {
-  border-color: var(--text-primary) !important;
-  box-shadow: none !important;
+	border-color: var(--text-primary) !important;
+	box-shadow: none !important;
 }
 
 /* Fix for disabled input fields */
 :root[data-theme='dark'] .ant-input[disabled],
 :root[data-theme='dark'] .ant-input-textarea[disabled] {
-  background: var(--component-background) !important;
-  color: var(--text-secondary) !important;
-  border-color: var(--border-color) !important;
+	background: var(--component-background) !important;
+	color: var(--text-secondary) !important;
+	border-color: var(--border-color) !important;
 }
