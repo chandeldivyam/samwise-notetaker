@@ -16,6 +16,8 @@
 	--editor-button-hover: #f3f4f6;
 	--editor-selection-bg: #e5e7eb;
 	--editor-code-bg: #f3f4f6;
+	--primary-color: #1677ff;
+	--primary-hover: #4096ff;
 }
 
 :root[data-theme='dark'] {
@@ -30,6 +32,8 @@
 	--editor-button-hover: #404040;
 	--editor-selection-bg: #404040;
 	--editor-code-bg: #1a1a1a;
+	--primary-color: #1677ff;
+	--primary-hover: #4096ff;
 }
 
 body {
@@ -252,17 +256,13 @@ body {
 	color: var(--text-primary) !important;
 }
 
-.ant-upload-list {
-	color: var(--text-primary) !important;
-}
-
 .ant-upload-list-item {
 	border-color: var(--border-color) !important;
 	background: var(--component-background) !important;
-}
-
-.ant-upload-list-item-name {
 	color: var(--text-primary) !important;
+	.anticon {
+		color: var(--text-primary) !important;
+	}
 }
 
 .ant-btn-primary {
@@ -274,17 +274,21 @@ body {
 	background: var(--component-background) !important;
 	border-color: var(--border-color) !important;
 	color: var(--text-primary) !important;
+	/* icon color */
+	.anticon {
+		color: var(--text-primary) !important;
+	}
 }
 
 .ant-btn.ant-btn-primary {
-	background: #1677ff !important;
-	border-color: #1677ff !important;
-	color: #ffffff !important;
+	background: var(--primary-color) !important;
+	border-color: var(--primary-hover) !important;
+	color: #fff !important;
 }
 
 .ant-btn.ant-btn-primary:hover {
-	background: #4096ff !important;
-	border-color: #4096ff !important;
+	background: var(--primary-hover) !important;
+	border-color: var(--primary-hover) !important;
 	color: #ffffff !important;
 }
 
@@ -343,4 +347,79 @@ body {
 	background: var(--component-background) !important;
 	color: var(--text-secondary) !important;
 	border-color: var(--border-color) !important;
+}
+
+.ant-card {
+	background: var(--component-background) !important;
+	border-color: var(--border-color) !important;
+}
+
+.ant-card-hoverable:hover {
+	border-color: var(--text-primary) !important;
+	box-shadow:
+		0 1px 2px -2px rgba(var(--text-primary), 0.16),
+		0 3px 6px 0 rgba(var(--text-primary), 0.12),
+		0 5px 12px 4px rgba(var(--text-primary), 0.09);
+}
+
+.ant-card-meta-title {
+	color: var(--text-primary) !important;
+}
+
+.ant-card-meta-description {
+	color: var(--text-secondary) !important;
+}
+.text-primary {
+	color: var(--foreground) !important;
+}
+
+.bg-component-background {
+	background-color: var(--component-background) !important;
+}
+
+:root[data-theme='light'] .ant-spin-dot-item {
+	background-color: var(--primary-color) !important;
+}
+
+/* Dark theme spinner color */
+:root[data-theme='dark'] .ant-spin-dot-item {
+	background-color: #ffffff !important;
+}
+
+.ant-table-thead > tr > th {
+	background-color: var(--component-background) !important;
+	color: var(--text-primary) !important;
+	border-color: var(--border-color) !important;
+}
+
+/* Override table body cells */
+.ant-table-tbody > tr > td {
+	background-color: var(--component-background) !important;
+	color: var(--text-primary) !important;
+	border-color: var(--border-color) !important;
+}
+
+/* Optionally, tweak other elements like pagination, etc. */
+.ant-pagination {
+	background-color: var(--component-background) !important;
+	color: var(--text-primary) !important;
+}
+
+/* Pagination item styles */
+.ant-pagination-item {
+	background-color: var(--component-background) !important;
+	border-color: var(--border-color) !important;
+}
+.ant-pagination-item a {
+	color: var(--text-primary) !important;
+}
+.ant-pagination-item-active a {
+	font-weight: bold !important;
+	color: var(--text-secondary);
+}
+
+/* Pagination arrows */
+.ant-pagination-prev .ant-pagination-item-link,
+.ant-pagination-next .ant-pagination-item-link {
+	color: var(--text-primary) !important;
 }

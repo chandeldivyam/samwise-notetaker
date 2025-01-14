@@ -9,6 +9,7 @@ import {
 	SettingOutlined,
 	LogoutOutlined,
 	FileTextOutlined,
+	VideoCameraOutlined,
 } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { BulbOutlined, BulbFilled } from '@ant-design/icons';
@@ -48,6 +49,15 @@ export default function DashboardNav() {
 				router.push('/dashboard/notes');
 			},
 			path: '/dashboard/notes',
+		},
+		{
+			key: 'recordings',
+			icon: <VideoCameraOutlined />,
+			label: 'Recordings',
+			onClick: () => {
+				router.push('/dashboard/recordings');
+			},
+			path: '/dashboard/recordings',
 		},
 		{
 			key: 'settings',
