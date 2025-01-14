@@ -11,8 +11,8 @@ import {
 	FileTextOutlined,
 } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
-import { createClient } from '@/utils/supabase/client';
 import { BulbOutlined, BulbFilled } from '@ant-design/icons';
+import { signOut } from '@/lib/actions/auth';
 
 const { Header } = Layout;
 import { useTheme } from '@/contexts/ThemeContext';
@@ -21,12 +21,13 @@ export default function DashboardNav() {
 	const router = useRouter();
 	const pathname = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
-	const supabase = createClient();
 	const { theme, toggleTheme } = useTheme();
 
 	const handleLogout = async () => {
-		await supabase.auth.signOut();
-		router.push('/login');
+		const { error } = await signOut();
+		if (!error) {
+			router.push('/login');
+		}
 	};
 
 	const menuItems = [

@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Upload, Form, Input, Button, Typography } from 'antd';
+import { Upload, Form, Input, Button, Typography, Progress } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { createRecording } from '@/lib/actions/recordings';
-import { uploadToS3, generateS3Key } from '@/utils/s3';
-import { createClient } from '@/utils/supabase/client';
+import { generateUploadUrl } from '@/lib/actions/s3';
+import { uploadFileWithProgress } from '@/utils/upload';
 import { useMessage, showSuccess, showError } from '@/utils/message';
+import { getCurrentUser } from '@/lib/actions/auth';
 
 const { Title } = Typography;
 const { Dragger } = Upload;
@@ -18,6 +19,7 @@ export default function NewRecordingPage() {
 	const [uploading, setUploading] = useState(false);
 	const [file, setFile] = useState<File | null>(null);
 	const messageApi = useMessage();
+	const [uploadProgress, setUploadProgress] = useState(0);
 
 	useEffect(() => {
 		const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -66,36 +68,42 @@ export default function NewRecordingPage() {
 			showError(messageApi, 'Please select a file to upload');
 			return;
 		}
-		const supabase = await createClient();
-		const { data: user } = await supabase.auth.getUser();
-		if (!user) {
-			showError(messageApi, 'User not authenticated');
-			return;
+
+		const { user, error: userError } = await getCurrentUser();
+		if (userError || !user) {
+			throw new Error('User not authenticated');
 		}
 
 		setUploading(true);
 		try {
-			const userId = user.user?.id;
+			const userId = user.id;
 			if (!userId) throw new Error('User ID not found');
-			const s3Key = await generateS3Key(userId, file.type);
-			const { error: uploadError } = await uploadToS3(file, s3Key);
 
-			if (uploadError) throw new Error(uploadError);
+			// Generate presigned URL from server action
+			const {
+				url,
+				key,
+				error: urlError,
+			} = await generateUploadUrl(userId, file.type, 'recordings');
+			if (urlError || !url || !key)
+				throw new Error(urlError || 'Failed to generate upload URL');
 
+			// Upload file with progress tracking
+			await uploadFileWithProgress(url, file, (progress) => {
+				setUploadProgress(progress);
+			});
+
+			// Create recording record in database
 			const { error } = await createRecording({
 				title: values.title,
 				description: values.description,
-				s3_key: s3Key,
+				s3_key: key,
 				original_filename: file.name,
 				file_type: file.type,
 				file_size: file.size,
 			});
 
-			if (error) {
-				showError(messageApi, 'Failed to upload recording');
-				console.error('Error:', error);
-				throw new Error(error);
-			}
+			if (error) throw new Error(error);
 
 			showSuccess(messageApi, 'Recording uploaded successfully');
 			router.push('/dashboard/recordings');
@@ -104,6 +112,7 @@ export default function NewRecordingPage() {
 			showError(messageApi, 'Failed to upload recording');
 		} finally {
 			setUploading(false);
+			setUploadProgress(0);
 		}
 	};
 
@@ -168,6 +177,14 @@ export default function NewRecordingPage() {
 							</p>
 						</Dragger>
 					</Form.Item>
+					{uploading && (
+						<div className="mt-4">
+							<Progress
+								percent={uploadProgress}
+								status="active"
+							/>
+						</div>
+					)}
 
 					<Form.Item className="mb-0">
 						<Button

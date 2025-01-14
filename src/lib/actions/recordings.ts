@@ -3,7 +3,6 @@
 
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { deleteFromS3 } from '@/utils/s3';
 import { CreateRecordingInput } from '@/types/recording';
 
 export async function createRecording(data: CreateRecordingInput) {
@@ -33,8 +32,7 @@ export async function createRecording(data: CreateRecordingInput) {
 		return { success: true };
 	} catch (error) {
 		console.error('Error creating recording:', error);
-		// If database insert fails, clean up the S3 file
-		await deleteFromS3(data.s3_key);
+		//TODO: If database insert fails, clean up the S3 file
 		return { error: 'Failed to create recording' };
 	}
 }
