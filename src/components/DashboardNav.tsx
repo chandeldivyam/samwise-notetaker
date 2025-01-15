@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Layout, Dropdown, Button } from 'antd';
 import {
 	MenuOutlined,
@@ -30,6 +30,19 @@ export default function DashboardNav() {
 			router.push('/login');
 		}
 	};
+
+	useEffect(() => {
+		const routes = [
+		  '/dashboard',
+		  '/dashboard/notes',
+		  '/dashboard/recordings',
+		  '/dashboard/settings'
+		];
+		
+		routes.forEach(route => {
+		  router.prefetch(route);
+		});
+	  }, []);
 
 	const menuItems = [
 		{
