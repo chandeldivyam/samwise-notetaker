@@ -12,7 +12,7 @@ import {
 	VideoCameraOutlined,
 } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
-import { BulbOutlined, BulbFilled } from '@ant-design/icons';
+import { MoonOutlined, SunFilled } from '@ant-design/icons';
 import { signOut } from '@/lib/actions/auth';
 
 const { Header } = Layout;
@@ -136,7 +136,7 @@ export default function DashboardNav() {
 			<div className="flex items-center gap-2">
 				<Button
 					type="text"
-					icon={theme === 'light' ? <BulbOutlined /> : <BulbFilled />}
+					icon={theme === 'light' ? <MoonOutlined /> : <SunFilled />}
 					onClick={toggleTheme}
 					className="flex items-center justify-center"
 				/>

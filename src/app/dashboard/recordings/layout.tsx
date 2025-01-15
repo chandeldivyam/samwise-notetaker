@@ -1,5 +1,4 @@
-'use client';
-
+// src/app/dashboard/recordings/layout.tsx
 import { RecordingsProvider } from '@/contexts/RecordingsContext';
 
 export default function RecordingsLayout({
