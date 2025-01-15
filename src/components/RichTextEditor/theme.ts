@@ -35,6 +35,7 @@ const ExampleTheme = {
 		],
 		ul: 'PlaygroundEditorTheme__ul',
 	},
+	link: 'PlaygroundEditorTheme__link',
 };
 
 export default ExampleTheme;

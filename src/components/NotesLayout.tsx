@@ -1,14 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Layout, Button, Typography, Spin, Collapse, Tooltip } from 'antd';
 import {
 	PlusOutlined,
 	EditOutlined,
 	FileTextOutlined,
 } from '@ant-design/icons';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useNotes } from '@/contexts/NotesContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useRouter } from 'next/navigation';
 
 const { Sider, Content } = Layout;
 const { Text } = Typography;
@@ -35,10 +35,66 @@ export default function NotesLayout({ children }: NotesLayoutProps) {
 	const pathname = usePathname();
 	const { groupedNotes, loading } = useNotes();
 	const { theme } = useTheme();
+	const router = useRouter();
+	const observerRef = useRef<IntersectionObserver | null>(null);
+	const noteRefs = useRef<Map<string, HTMLDivElement>>(new Map());
 
-	const handlePanelChange = (keys: string | string[]) => {
-		setOpenPanels(typeof keys === 'string' ? [keys] : keys);
-	};
+	// Initialize intersection observer
+	useEffect(() => {
+		observerRef.current = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						const noteId =
+							entry.target.getAttribute('data-note-id');
+						if (noteId) {
+							router.prefetch(`/dashboard/notes/${noteId}`);
+						}
+					}
+				});
+			},
+			{
+				root: null,
+				rootMargin: '50px',
+				threshold: 0.1,
+			}
+		);
+
+		return () => {
+			if (observerRef.current) {
+				observerRef.current.disconnect();
+			}
+		};
+	}, [router]);
+
+	// Handle panel expansion and prefetch notes
+	const handlePanelChange = useCallback(
+		(keys: string | string[]) => {
+			const newKeys = typeof keys === 'string' ? [keys] : keys;
+			setOpenPanels(newKeys);
+
+			// Prefetch all notes in newly opened panels
+			newKeys.forEach((date) => {
+				if (!openPanels.includes(date) && groupedNotes[date]) {
+					groupedNotes[date].forEach((note) => {
+						router.prefetch(`/dashboard/notes/${note.id}`);
+					});
+				}
+			});
+		},
+		[openPanels, groupedNotes, router]
+	);
+
+	// Register note element refs and observe them
+	const registerNoteRef = useCallback(
+		(noteId: string, element: HTMLDivElement | null) => {
+			if (element && observerRef.current) {
+				noteRefs.current.set(noteId, element);
+				observerRef.current.observe(element);
+			}
+		},
+		[]
+	);
 
 	return (
 		<Layout className="min-h-[calc(100vh-64px)]">
@@ -49,21 +105,21 @@ export default function NotesLayout({ children }: NotesLayoutProps) {
 				width={300}
 				theme={theme}
 				className="border-r border-border-color bg-component-background"
+				suppressHydrationWarning
 			>
 				<div className="p-4">
 					<Tooltip
 						title={collapsed ? 'New Note' : ''}
 						placement="right"
 					>
-						<Link href="/dashboard/notes/new">
-							<Button
-								type="primary"
-								icon={<PlusOutlined />}
-								block
-							>
-								{!collapsed && 'New Note'}
-							</Button>
-						</Link>
+						<Button
+							type="primary"
+							icon={<PlusOutlined />}
+							block
+							onClick={() => router.push('/dashboard/notes/new')}
+						>
+							{!collapsed && 'New Note'}
+						</Button>
 					</Tooltip>
 				</div>
 
@@ -131,37 +187,53 @@ export default function NotesLayout({ children }: NotesLayoutProps) {
 												}
 												placement="right"
 											>
-												<Link
-													href={`/dashboard/notes/${note.id}`}
+												<div
+													ref={(el) =>
+														registerNoteRef(
+															note.id,
+															el
+														)
+													}
+													data-note-id={note.id}
+													role="button"
+													tabIndex={0}
+													onClick={() =>
+														router.push(
+															`/dashboard/notes/${note.id}`
+														)
+													}
+													onKeyDown={(e) =>
+														e.key === 'Enter' &&
+														router.push(
+															`/dashboard/notes/${note.id}`
+														)
+													}
+													className={`
+                            px-2 py-2 mb-1 cursor-pointer
+                            hover:bg-editor-button-hover rounded-md
+                            transition-colors duration-200
+                            flex items-center gap-2
+                            ${pathname === `/dashboard/notes/${note.id}` ? 'bg-editor-button-hover' : ''}
+                            ${collapsed ? 'justify-center' : ''}
+                          `}
 												>
-													<div
-														className={`
-                              px-2 py-2 mb-1 cursor-pointer
-                              hover:bg-editor-button-hover rounded-md
-                              transition-colors duration-200
-                              flex items-center gap-2
-                              ${pathname === `/dashboard/notes/${note.id}` ? 'bg-editor-button-hover' : ''}
-                              ${collapsed ? 'justify-center' : ''}
-                            `}
-													>
-														{collapsed ? (
-															<FileTextOutlined className="text-text-secondary" />
-														) : (
-															<>
-																<EditOutlined className="text-text-secondary" />
-																<Text
-																	className={`
-                                    truncate flex-1
-                                    ${pathname === `/dashboard/notes/${note.id}` ? 'font-medium' : ''}
-                                  `}
-																>
-																	{note.title ||
-																		'Untitled'}
-																</Text>
-															</>
-														)}
-													</div>
-												</Link>
+													{collapsed ? (
+														<FileTextOutlined className="text-text-secondary" />
+													) : (
+														<>
+															<EditOutlined className="text-text-secondary" />
+															<Text
+																className={`
+                                  truncate flex-1
+                                  ${pathname === `/dashboard/notes/${note.id}` ? 'font-medium' : ''}
+                                `}
+															>
+																{note.title ||
+																	'Untitled'}
+															</Text>
+														</>
+													)}
+												</div>
 											</Tooltip>
 										))}
 									</Panel>

@@ -1,9 +1,14 @@
-/* src/app/globals.css */
+/* ----------------------------------------
+   1. Import & Tailwind Base
+---------------------------------------- */
 @import 'antd/dist/reset.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ----------------------------------------
+   2. Theme Variables
+---------------------------------------- */
 :root[data-theme='light'] {
 	--background: #ffffff;
 	--foreground: #171717;
@@ -16,6 +21,8 @@
 	--editor-button-hover: #f3f4f6;
 	--editor-selection-bg: #e5e7eb;
 	--editor-code-bg: #f3f4f6;
+	--primary-color: #1677ff;
+	--primary-hover: #4096ff;
 }
 
 :root[data-theme='dark'] {
@@ -30,189 +37,241 @@
 	--editor-button-hover: #404040;
 	--editor-selection-bg: #404040;
 	--editor-code-bg: #1a1a1a;
+	--primary-color: #1677ff;
+	--primary-hover: #4096ff;
 }
 
+/* ----------------------------------------
+   3. Base Body & Layout
+---------------------------------------- */
 body {
 	color: var(--text-primary);
 	background: var(--background);
 }
 
-/* Add these styles for dark mode compatibility */
-.ant-layout {
+.ant-layout,
+.ant-layout-sider,
+.ant-layout-content,
+.ant-layout-footer {
 	background: var(--background) !important;
 }
 
-.ant-input {
-	color: var(--text-primary) !important;
-}
+/* If the sider/header needs a different BG than the content, override it:
+   .ant-layout-sider, .ant-layout-header { background: var(--component-background) !important; } */
 
-.ant-layout-header {
+/* ----------------------------------------
+   4. Generic Components
+---------------------------------------- */
+/* Buttons */
+.ant-btn {
 	background: var(--component-background) !important;
 	border-color: var(--border-color) !important;
+	color: var(--text-primary) !important;
+
+	.anticon {
+		color: var(--text-primary) !important;
+	}
 }
 
-.ant-layout-sider {
-	background: var(--component-background) !important;
+.ant-btn-primary {
+	background: var(--primary-color) !important;
+	border-color: var(--primary-hover) !important;
+	color: #fff !important;
+
+	.anticon {
+		color: #fff !important;
+	}
+}
+.ant-btn-primary:hover {
+	background: var(--primary-hover) !important;
+	border-color: var(--primary-hover) !important;
+	color: #fff !important;
+}
+.ant-btn:hover {
+	border-color: var(--text-primary) !important;
+}
+
+/* Disabled primary button states */
+.ant-btn-primary[disabled],
+.ant-btn-primary[disabled]:hover {
+	background: rgba(0, 0, 0, 0.04) !important;
 	border-color: var(--border-color) !important;
+	color: rgba(0, 0, 0, 0.25) !important;
+}
+:root[data-theme='dark'] .ant-btn-primary[disabled],
+:root[data-theme='dark'] .ant-btn-primary[disabled]:hover {
+	background: rgba(255, 255, 255, 0.08) !important;
+	color: rgba(255, 255, 255, 0.25) !important;
 }
 
-.ant-btn-text {
-	color: var(--text-primary) !important;
-}
-
-.ant-typography {
-	color: var(--text-primary) !important;
-}
-
-.editor-container {
-	background: var(--component-background);
-	border-color: var(--border-color) !important;
-}
-
-.editor-input {
-	color: var(--text-primary) !important;
-}
-
-.editor-placeholder {
-	color: var(--text-secondary) !important;
-}
-
-.editor-shell {
-	background: var(--component-background);
-	color: var(--text-primary);
-}
-
-.editor-container {
-	background: var(--component-background);
-	color: var(--text-primary);
-}
-
-.ant-collapse {
-	background: var(--component-background) !important;
-}
-
-.ant-collapse-header {
-	color: var(--text-primary) !important;
-}
-
-.ant-collapse-content {
-	background: var(--component-background) !important;
-}
-
-.ant-layout-sider {
-	background: var(--component-background) !important;
-}
-
-.ant-layout-content {
-	background: var(--component-background) !important;
-}
-
-.ant-select {
-	background: var(--component-background) !important;
-}
-
+/* Inputs & TextAreas */
+.ant-input,
+.ant-input-affix-wrapper,
+.ant-input-group-addon,
+.ant-input-textarea,
 .ant-select-selector {
 	background: var(--component-background) !important;
 	color: var(--text-primary) !important;
 	border-color: var(--border-color) !important;
 }
+.ant-input::placeholder,
+.ant-input-textarea::placeholder {
+	color: var(--text-secondary) !important;
+}
+.ant-input:focus,
+.ant-input:hover,
+.ant-input-textarea:focus,
+.ant-input-textarea:hover {
+	border-color: var(--text-primary) !important;
+	box-shadow: none !important;
+}
 
-.ant-select-dropdown {
+.ant-typography {
+	color: var(--text-primary) !important;
+}
+/* Dark theme specifically for disabled fields */
+:root[data-theme='dark'] .ant-input[disabled],
+:root[data-theme='dark'] .ant-input-textarea[disabled] {
 	background: var(--component-background) !important;
+	color: var(--text-secondary) !important;
 	border-color: var(--border-color) !important;
 }
 
-.ant-select-item {
-	color: var(--text-primary) !important;
-}
-
-.ant-select-item-option-active:not(.ant-select-item-option-disabled) {
-	background-color: var(--editor-button-hover) !important;
-}
-
-.ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-	background-color: var(--editor-selection-bg) !important;
-}
-
-.ant-select-arrow {
-	color: var(--text-primary) !important;
-}
-
-.ant-layout-sider {
+/* Upload */
+.ant-upload-drag {
 	background: var(--component-background) !important;
 	border-color: var(--border-color) !important;
 }
-
-:root[data-theme='light'] .ant-input::placeholder {
-	color: var(--text-secondary) !important;
+.ant-upload-drag:hover {
+	border-color: var(--text-primary) !important;
 }
-
-/* Dark theme placeholder */
-:root[data-theme='dark'] .ant-input::placeholder {
-	color: var(--text-secondary) !important;
-}
-
-/* For cross-browser compatibility */
-:root[data-theme='light'] .ant-input::-webkit-input-placeholder {
-	color: var(--text-secondary) !important;
-}
-
-:root[data-theme='dark'] .ant-input::-webkit-input-placeholder {
-	color: var(--text-secondary) !important;
-}
-
-:root[data-theme='light'] .ant-input::-moz-placeholder {
-	color: var(--text-secondary) !important;
-}
-
-:root[data-theme='dark'] .ant-input::-moz-placeholder {
-	color: var(--text-secondary) !important;
-}
-
-.ant-layout {
-	background: var(--background) !important;
-}
-
-.ant-layout-footer {
-	background: var(--component-background) !important;
-	border-top: 1px solid var(--border-color);
+.ant-upload-drag-icon .anticon {
 	color: var(--text-primary) !important;
 }
-
-/* Fix for the bottom bar specifically */
-.ant-layout-sider-children {
+.ant-upload-text {
+	color: var(--text-primary) !important;
+}
+.ant-upload-hint {
+	color: var(--text-secondary) !important;
+}
+.ant-upload-list-item {
+	border-color: var(--border-color) !important;
 	background: var(--component-background) !important;
+	color: var(--text-primary) !important;
+	.anticon {
+		color: var(--text-primary) !important;
+	}
 }
 
+/* Editor (assuming .editor-* classes) */
+.editor-container,
+.editor-shell {
+	background: var(--component-background);
+	color: var(--text-primary);
+	border-color: var(--border-color) !important;
+}
+.editor-input {
+	color: var(--text-primary) !important;
+}
+.editor-placeholder {
+	color: var(--text-secondary) !important;
+}
+
+/* Collapse */
+.ant-collapse,
+.ant-collapse-content,
+.ant-collapse-header {
+	background: var(--component-background) !important;
+	color: var(--text-primary) !important;
+	border-color: var(--border-color) !important;
+}
+.ant-collapse-item .ant-collapse-header {
+	justify-content: center !important;
+}
+
+/* Upload trigger button for sider */
 .ant-layout-sider-trigger {
 	background: var(--component-background) !important;
 	border: 1px solid var(--border-color) !important;
 	color: var(--text-primary) !important;
 }
-
-/* Hover state for the trigger button */
 .ant-layout-sider-trigger:hover {
 	background: var(--editor-button-hover) !important;
 }
-
-/* For the collapse icon in the trigger */
 .ant-layout-sider-trigger .anticon {
 	color: var(--text-primary) !important;
 }
 
-.ant-collapse-collapsed .ant-collapse-header {
-	padding: 8px 8px !important;
-	justify-content: center !important;
+/* Card */
+.ant-card {
+	background: var(--component-background) !important;
+	border-color: var(--border-color) !important;
+}
+.ant-card-hoverable:hover {
+	border-color: var(--text-primary) !important;
+	/* Slight box shadow example, if desired:
+  box-shadow: 0 1px 2px -2px rgba(23, 23, 23, 0.16),
+              0 3px 6px 0 rgba(23, 23, 23, 0.12),
+              0 5px 12px 4px rgba(23, 23, 23, 0.09); */
+}
+.ant-card-meta-title {
+	color: var(--text-primary) !important;
+}
+.ant-card-meta-description {
+	color: var(--text-secondary) !important;
 }
 
-.ant-collapse-collapsed .ant-collapse-content {
-	padding: 0 8px !important;
+/* Spinner */
+:root[data-theme='light'] .ant-spin-dot-item {
+	background-color: var(--primary-color) !important;
+}
+:root[data-theme='dark'] .ant-spin-dot-item {
+	background-color: #ffffff !important;
 }
 
-.collapsed-panel .ant-collapse-header {
-	min-height: 32px !important;
+/* Table */
+.ant-table-thead > tr > th,
+.ant-table-tbody > tr > td {
+	background-color: var(--component-background) !important;
+	color: var(--text-primary) !important;
+	border-color: var(--border-color) !important;
 }
 
-.ant-collapse-collapsed .ant-collapse-expand-icon {
-	display: none !important;
+/* Pagination */
+.ant-pagination,
+.ant-pagination-item,
+.ant-pagination-prev .ant-pagination-item-link,
+.ant-pagination-next .ant-pagination-item-link {
+	background-color: var(--component-background) !important;
+	color: var(--text-primary) !important;
+	border-color: var(--border-color) !important;
+}
+.ant-pagination-item a {
+	color: var(--text-primary) !important;
+}
+.ant-pagination-item-active a {
+	font-weight: bold !important;
+	color: var(--text-primary) !important;
+}
+
+/* Form */
+.ant-form-item {
+	color: var(--text-primary) !important;
+}
+.ant-form-item-label > label {
+	color: var(--text-primary) !important;
+}
+.ant-form-item-explain {
+	color: var(--text-secondary) !important;
+}
+
+/* ----------------------------------------
+   5. Utility Classes
+---------------------------------------- */
+.text-primary {
+	color: var(--foreground) !important;
+}
+
+.bg-component-background {
+	background-color: var(--component-background) !important;
 }

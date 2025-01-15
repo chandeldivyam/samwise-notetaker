@@ -130,7 +130,7 @@ export async function getNote(id: string) {
 			.from('notes')
 			.select('*')
 			.eq('id', id)
-			.eq('user_id', user.id) // Ensure user owns the note
+			.eq('user_id', user.id)
 			.single();
 
 		if (error) throw error;

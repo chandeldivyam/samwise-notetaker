@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Layout, Dropdown, Button } from 'antd';
 import {
 	MenuOutlined,
@@ -9,10 +9,11 @@ import {
 	SettingOutlined,
 	LogoutOutlined,
 	FileTextOutlined,
+	VideoCameraOutlined,
 } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
-import { createClient } from '@/utils/supabase/client';
-import { BulbOutlined, BulbFilled } from '@ant-design/icons';
+import { MoonOutlined, SunFilled } from '@ant-design/icons';
+import { signOut } from '@/lib/actions/auth';
 
 const { Header } = Layout;
 import { useTheme } from '@/contexts/ThemeContext';
@@ -21,13 +22,27 @@ export default function DashboardNav() {
 	const router = useRouter();
 	const pathname = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
-	const supabase = createClient();
 	const { theme, toggleTheme } = useTheme();
 
 	const handleLogout = async () => {
-		await supabase.auth.signOut();
-		router.push('/login');
+		const { error } = await signOut();
+		if (!error) {
+			router.push('/login');
+		}
 	};
+
+	useEffect(() => {
+		const routes = [
+			'/dashboard',
+			'/dashboard/notes',
+			'/dashboard/recordings',
+			'/dashboard/settings',
+		];
+
+		routes.forEach((route) => {
+			router.prefetch(route);
+		});
+	}, []);
 
 	const menuItems = [
 		{
@@ -47,6 +62,15 @@ export default function DashboardNav() {
 				router.push('/dashboard/notes');
 			},
 			path: '/dashboard/notes',
+		},
+		{
+			key: 'recordings',
+			icon: <VideoCameraOutlined />,
+			label: 'Recordings',
+			onClick: () => {
+				router.push('/dashboard/recordings');
+			},
+			path: '/dashboard/recordings',
 		},
 		{
 			key: 'settings',
@@ -112,7 +136,7 @@ export default function DashboardNav() {
 			<div className="flex items-center gap-2">
 				<Button
 					type="text"
-					icon={theme === 'light' ? <BulbOutlined /> : <BulbFilled />}
+					icon={theme === 'light' ? <MoonOutlined /> : <SunFilled />}
 					onClick={toggleTheme}
 					className="flex items-center justify-center"
 				/>

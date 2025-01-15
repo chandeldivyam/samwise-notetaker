@@ -13,6 +13,9 @@ import { editorConfig } from './config';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin';
 import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPlugin';
+import MyAutoLinkPlugin from './plugins/AutoLinkPlugin';
+import MyLinkPlugin from './plugins/LinkPlugin';
+import MyClickableLinkPlugin from './plugins/ClickableLinkPlugin';
 
 interface RichTextEditorProps {
 	content?: string;
@@ -62,6 +65,9 @@ export default function RichTextEditor({
 						}}
 					/>
 					<HistoryPlugin />
+					<MyAutoLinkPlugin />
+					<MyLinkPlugin />
+					<MyClickableLinkPlugin />
 					<AutoFocusPlugin />
 				</div>
 			</div>
