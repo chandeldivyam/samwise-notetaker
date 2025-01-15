@@ -33,16 +33,16 @@ export default function DashboardNav() {
 
 	useEffect(() => {
 		const routes = [
-		  '/dashboard',
-		  '/dashboard/notes',
-		  '/dashboard/recordings',
-		  '/dashboard/settings'
+			'/dashboard',
+			'/dashboard/notes',
+			'/dashboard/recordings',
+			'/dashboard/settings',
 		];
-		
-		routes.forEach(route => {
-		  router.prefetch(route);
+
+		routes.forEach((route) => {
+			router.prefetch(route);
 		});
-	  }, []);
+	}, []);
 
 	const menuItems = [
 		{
