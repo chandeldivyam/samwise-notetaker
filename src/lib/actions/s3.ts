@@ -5,6 +5,7 @@ import {
 	S3Client,
 	PutObjectCommand,
 	GetObjectCommand,
+	DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
@@ -62,3 +63,21 @@ export async function getS3SignedUrl(key: string) {
 		return { error: 'Failed to generate signed URL' };
 	}
 }
+
+export async function deleteS3Object(key: string) {
+	try {
+	  const command = new DeleteObjectCommand({
+		Bucket: process.env.S3_BUCKET_NAME!,
+		Key: key,
+	  });
+  
+	  await s3Client.send(command);
+	  console.log('S3 object deleted:', key);
+	  return { success: true };
+	} catch (error) {
+	  console.error('Error deleting S3 object:', error);
+	  return { error: 'Failed to delete S3 object' };
+	}
+  }
+  
+  

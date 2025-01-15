@@ -33,21 +33,25 @@ export default function RecordingsList({
 	const message = useMessage();
 
 	const handleDelete = async (id: string) => {
-		setDeletingId(id);
-		try {
-			const { error } = await deleteRecording(id);
-			if (error) throw error;
-
-			showSuccess(message, 'Recording deleted successfully');
-			setRecordings(recordings.filter((rec) => rec.id !== id));
-			router.refresh();
-		} catch (error) {
-			showError(message, 'Failed to delete recording');
-			console.error('Error:', error);
-		} finally {
-			setDeletingId(null);
-		}
-	};
+        setDeletingId(id);
+        try {
+          const { error, details } = await deleteRecording(id);
+          if (error) {
+            showError(message, `Failed to delete recording: ${details || error}`);
+            return;
+          }
+      
+          showSuccess(message, 'Recording deleted successfully');
+          setRecordings(recordings.filter((rec) => rec.id !== id));
+          router.refresh();
+        } catch (error) {
+          showError(message, 'An unexpected error occurred while deleting the recording');
+          console.error('Error:', error);
+        } finally {
+          setDeletingId(null);
+        }
+      };
+      
 
 	const handleRowClick = (record: Recording) => {
 		router.push(`/dashboard/recordings/${record.id}`);

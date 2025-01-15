@@ -4,6 +4,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { revalidatePath } from 'next/cache';
 import { CreateRecordingInput } from '@/types/recording';
+import { deleteS3Object } from './s3';
 
 export async function createRecording(data: CreateRecordingInput) {
 	try {
@@ -75,33 +76,50 @@ export async function getRecording(id: string) {
 }
 
 export async function deleteRecording(id: string) {
+	const supabase = await createClient();
+  
 	try {
-		const supabase = await createClient();
-
-		// Get the recording first to get the S3 key
-		const { data: recording, error: fetchError } = await supabase
-			.from('recordings')
-			.select('s3_key')
-			.eq('id', id)
-			.single();
-
-		if (fetchError) throw fetchError;
-		if (!recording) throw new Error('Recording not found');
-
-		// Delete from database
-		const { error: deleteError } = await supabase
-			.from('recordings')
-			.delete()
-			.eq('id', id);
-
-		if (deleteError) throw deleteError;
-
-		// TODO: Delete from S3
-		// You'll need to implement S3 deletion here
-
-		return { success: true };
+	  // Start a Supabase transaction
+	  const { data: recording, error: fetchError } = await supabase
+		.from('recordings')
+		.select('s3_key')
+		.eq('id', id)
+		.single();
+  
+	  if (fetchError) throw fetchError;
+	  if (!recording) throw new Error('Recording not found');
+  
+	  // Delete from S3 first
+	  const { error: s3Error } = await deleteS3Object(recording.s3_key);
+	  if (s3Error) throw s3Error;
+  
+	  // If S3 deletion succeeds, delete from database
+	  const { error: deleteError } = await supabase
+		.from('recordings')
+		.delete()
+		.eq('id', id);
+  
+	  if (deleteError) {
+		// If database deletion fails, we should log this as an inconsistency
+		// since the S3 file is already deleted
+		console.error('Database deletion failed after S3 deletion:', deleteError);
+		throw deleteError;
+	  }
+  
+	  return { success: true };
 	} catch (error) {
-		console.error('Error deleting recording:', error);
-		return { error: 'Failed to delete recording' };
+	  console.error('Error in deleteRecording:', error);
+	  
+	  // If this was a database error and S3 deletion already happened,
+	  // we should log this for administrative cleanup
+	  if (error instanceof Error) {
+		return { 
+		  error: 'Failed to delete recording',
+		  details: error.message 
+		};
+	  }
+	  return { error: 'Failed to delete recording' };
 	}
-}
+  }
+  
+  
