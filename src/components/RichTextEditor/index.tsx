@@ -1,6 +1,7 @@
 'use client';
 
 import './editor.css';
+import { useRef, useEffect, useState } from 'react';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
@@ -16,61 +17,82 @@ import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPl
 import MyAutoLinkPlugin from './plugins/AutoLinkPlugin';
 import MyLinkPlugin from './plugins/LinkPlugin';
 import MyClickableLinkPlugin from './plugins/ClickableLinkPlugin';
+import EmojisPlugin from './plugins/EmojisPlugin';
+import EmojiPickerPlugin from './plugins/EmojiPickerPlugin';
+import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
 
 interface RichTextEditorProps {
-	content?: string;
-	onChange?: (content: string) => void;
-	placeholder?: string;
-	value?: string;
+  content?: string;
+  onChange?: (content: string) => void;
+  placeholder?: string;
+  value?: string;
 }
 
 export default function RichTextEditor({
-	content,
-	onChange,
-	placeholder = 'Start writing...',
-	value,
+  content,
+  onChange,
+  placeholder = 'Start writing...',
+  value,
 }: RichTextEditorProps) {
-	const initialConfig = {
-		...editorConfig,
-		editorState: value || content,
-		onError: (error: Error) => {
-			console.error(error);
-		},
-	};
+  const editorContainerRef = useRef<HTMLDivElement>(null);
+  const [isEditorReady, setIsEditorReady] = useState(false);
 
-	return (
-		<LexicalComposer initialConfig={initialConfig}>
-			<div className="editor-container">
-				<ToolbarPlugin />
-				<div className="editor-inner">
-					<RichTextPlugin
-						contentEditable={
-							<ContentEditable className="editor-input" />
-						}
-						placeholder={
-							<div className="editor-placeholder">
-								{placeholder}
-							</div>
-						}
-						ErrorBoundary={LexicalErrorBoundary}
-					/>
-					<ListPlugin />
-					<MarkdownShortcutPlugin />
-					<TabIndentationPlugin />
-					<OnChangePlugin
-						onChange={(editorState) => {
-							if (onChange) {
-								onChange(JSON.stringify(editorState));
-							}
-						}}
-					/>
-					<HistoryPlugin />
-					<MyAutoLinkPlugin />
-					<MyLinkPlugin />
-					<MyClickableLinkPlugin />
-					<AutoFocusPlugin />
-				</div>
-			</div>
-		</LexicalComposer>
-	);
+  const initialConfig = {
+    ...editorConfig,
+    editorState: value || content,
+    onError: (error: Error) => {
+      console.error(error);
+    },
+  };
+
+  useEffect(() => {
+    if (editorContainerRef.current) {
+      setIsEditorReady(true);
+    }
+  }, []);
+
+  return (
+    <LexicalComposer initialConfig={initialConfig}>
+      <div 
+        className="editor-container"
+        ref={editorContainerRef}
+        style={{ position: 'relative' }}
+      >
+        <ToolbarPlugin />
+        <div className="editor-inner">
+          <RichTextPlugin
+            contentEditable={
+              <ContentEditable className="editor-input" />
+            }
+            placeholder={
+              <div className="editor-placeholder">
+                {placeholder}
+              </div>
+            }
+            ErrorBoundary={LexicalErrorBoundary}
+          />
+          <ListPlugin />
+          <MarkdownShortcutPlugin />
+          <TabIndentationPlugin />
+          <EmojisPlugin />
+          <EmojiPickerPlugin />
+          {isEditorReady && editorContainerRef.current && (
+            <DraggableBlockPlugin anchorElem={editorContainerRef.current} />
+          )}
+          <OnChangePlugin
+            onChange={(editorState) => {
+              if (onChange) {
+                onChange(JSON.stringify(editorState));
+              }
+            }}
+          />
+          <HistoryPlugin />
+          <MyAutoLinkPlugin />
+          <MyLinkPlugin />
+          <MyClickableLinkPlugin />
+          <AutoFocusPlugin />
+        </div>
+      </div>
+    </LexicalComposer>
+  );
 }
