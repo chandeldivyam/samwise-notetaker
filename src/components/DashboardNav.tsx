@@ -10,6 +10,7 @@ import {
 	LogoutOutlined,
 	FileTextOutlined,
 	VideoCameraOutlined,
+	SmileOutlined,
 } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { MoonOutlined, SunFilled } from '@ant-design/icons';
@@ -37,6 +38,7 @@ export default function DashboardNav() {
 			'/dashboard/notes',
 			'/dashboard/recordings',
 			'/dashboard/settings',
+			'/dashboard/people',
 		];
 
 		routes.forEach((route) => {
@@ -71,6 +73,15 @@ export default function DashboardNav() {
 				router.push('/dashboard/recordings');
 			},
 			path: '/dashboard/recordings',
+		},
+		{
+			key: 'people',
+			icon: <SmileOutlined />,
+			label: 'People',
+			onClick: () => {
+				router.push('/dashboard/people');
+			},
+			path: '/dashboard/people',
 		},
 		{
 			key: 'settings',

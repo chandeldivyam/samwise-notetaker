@@ -275,3 +275,23 @@ body {
 .bg-component-background {
 	background-color: var(--component-background) !important;
 }
+
+.ant-select-multiple {
+	background: var(--component-background) !important;
+	border: 1px solid var(--border-color) !important;
+	color: var(--text-primary) !important;
+  }
+
+  .ant-select-selection-item {
+	color: var(--text-primary) !important;
+  }
+  
+  /* 2. Remove icon inside the pill/chip */
+  .ant-select-multiple .ant-select-selection-item-remove .anticon {
+	color: var(--text-primary) !important;
+  }
+  
+  /* 3. The arrow icon on the right side */
+  .ant-select-arrow .anticon {
+	color: var(--text-primary) !important;
+  }

@@ -20,8 +20,6 @@ import MyClickableLinkPlugin from './plugins/ClickableLinkPlugin';
 import EmojisPlugin from './plugins/EmojisPlugin';
 import EmojiPickerPlugin from './plugins/EmojiPickerPlugin';
 import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
-import MarkdownPlugin from './plugins/MarkdownPlugin';
-import { exportMarkdown } from './utils/markdownUtils';
 
 interface RichTextEditorProps {
   content?: string;
