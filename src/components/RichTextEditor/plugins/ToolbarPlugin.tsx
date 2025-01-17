@@ -30,8 +30,11 @@ import {
 	AlignLeftOutlined,
 	AlignCenterOutlined,
 	AlignRightOutlined,
+	CopyOutlined,
 } from '@ant-design/icons';
 import { BLOCK_TYPE_TO_BLOCKTYPE } from '../config';
+import { exportMarkdown } from '../utils/markdownUtils';
+import { useMessage, showError, showSuccess } from '@/utils/message';
 
 export default function ToolbarPlugin() {
 	const [editor] = useLexicalComposerContext();
@@ -42,6 +45,7 @@ export default function ToolbarPlugin() {
 	const [isStrikethrough, setIsStrikethrough] = useState(false);
 	const [canUndo, setCanUndo] = useState(false);
 	const [canRedo, setCanRedo] = useState(false);
+	const messageApi = useMessage();
 
 	const updateToolbar = useCallback(() => {
 		const selection = $getSelection();
@@ -110,6 +114,19 @@ export default function ToolbarPlugin() {
 				}
 			}
 		});
+	};
+
+	const copyToClipboard = () => {
+		const markdown = exportMarkdown(editor);
+		navigator.clipboard
+			.writeText(markdown)
+			.then(() => {
+				showSuccess(messageApi, 'Markdown copied to clipboard!');
+			})
+			.catch((err) => {
+				showError(messageApi, 'Failed to copy markdown to clipboard');
+				console.error(err);
+			});
 	};
 
 	useEffect(() => {
@@ -232,6 +249,12 @@ export default function ToolbarPlugin() {
 					onClick={() => {
 						editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right');
 					}}
+				/>
+
+<Button
+					type="text"
+					icon={<CopyOutlined />}
+					onClick={copyToClipboard}
 				/>
 			</Space>
 		</div>

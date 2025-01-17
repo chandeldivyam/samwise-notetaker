@@ -21,12 +21,14 @@ class EmojiOption extends MenuOption {
   title: string;
   emoji: string;
   keywords: Array<string>;
+  name: string;
 
-  constructor(title: string, emoji: string, options: { keywords?: Array<string> }) {
+  constructor(title: string, emoji: string, options: { keywords?: Array<string>, name: string }) {
     super(title);
     this.title = title;
     this.emoji = emoji;
     this.keywords = options.keywords || [];
+    this.name = options.name;
   }
 }
 
@@ -76,6 +78,7 @@ export default function EmojiPickerPlugin() {
         ({ emoji, aliases, tags }) =>
           new EmojiOption(aliases[0], emoji, {
             keywords: [...aliases, ...tags],
+            name: aliases[0],
           }),
       ),
     [],
