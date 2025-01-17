@@ -251,7 +251,7 @@ export default function ToolbarPlugin() {
 					}}
 				/>
 
-<Button
+				<Button
 					type="text"
 					icon={<CopyOutlined />}
 					onClick={copyToClipboard}

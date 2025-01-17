@@ -22,77 +22,79 @@ import EmojiPickerPlugin from './plugins/EmojiPickerPlugin';
 import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
 
 interface RichTextEditorProps {
-  content?: string;
-  onChange?: (content: string) => void;
-  placeholder?: string;
-  value?: string;
+	content?: string;
+	onChange?: (content: string) => void;
+	placeholder?: string;
+	value?: string;
 }
 
 export default function RichTextEditor({
-  content,
-  onChange,
-  placeholder = 'Start writing...',
-  value,
+	content,
+	onChange,
+	placeholder = 'Start writing...',
+	value,
 }: RichTextEditorProps) {
-  const editorContainerRef = useRef<HTMLDivElement>(null);
-  const [isEditorReady, setIsEditorReady] = useState(false);
+	const editorContainerRef = useRef<HTMLDivElement>(null);
+	const [isEditorReady, setIsEditorReady] = useState(false);
 
-  const initialConfig = {
-    ...editorConfig,
-    editorState: value || content,
-    onError: (error: Error) => {
-      console.error(error);
-    },
-  };
+	const initialConfig = {
+		...editorConfig,
+		editorState: value || content,
+		onError: (error: Error) => {
+			console.error(error);
+		},
+	};
 
-  useEffect(() => {
-    if (editorContainerRef.current) {
-      setIsEditorReady(true);
-    }
-  }, []);
+	useEffect(() => {
+		if (editorContainerRef.current) {
+			setIsEditorReady(true);
+		}
+	}, []);
 
-  return (
-    <LexicalComposer initialConfig={initialConfig}>
-      <div 
-        className="editor-container"
-        ref={editorContainerRef}
-        style={{ position: 'relative' }}
-      >
-        <ToolbarPlugin />
-        <div className="editor-inner">
-          <RichTextPlugin
-            contentEditable={
-              <ContentEditable className="editor-input" />
-            }
-            placeholder={
-              <div className="editor-placeholder">
-                {placeholder}
-              </div>
-            }
-            ErrorBoundary={LexicalErrorBoundary}
-          />
-          <ListPlugin />
-          <MarkdownShortcutPlugin />
-          <TabIndentationPlugin />
-          <EmojisPlugin />
-          <EmojiPickerPlugin />
-          {isEditorReady && editorContainerRef.current && (
-            <DraggableBlockPlugin anchorElem={editorContainerRef.current} />
-          )}
-          <OnChangePlugin
-            onChange={(editorState) => {
-              if (onChange) {
-                onChange(JSON.stringify(editorState));
-              }
-            }}
-          />
-          <HistoryPlugin />
-          <MyAutoLinkPlugin />
-          <MyLinkPlugin />
-          <MyClickableLinkPlugin />
-          <AutoFocusPlugin />
-        </div>
-      </div>
-    </LexicalComposer>
-  );
+	return (
+		<LexicalComposer initialConfig={initialConfig}>
+			<div
+				className="editor-container"
+				ref={editorContainerRef}
+				style={{ position: 'relative' }}
+			>
+				<ToolbarPlugin />
+				<div className="editor-inner">
+					<RichTextPlugin
+						contentEditable={
+							<ContentEditable className="editor-input" />
+						}
+						placeholder={
+							<div className="editor-placeholder">
+								{placeholder}
+							</div>
+						}
+						ErrorBoundary={LexicalErrorBoundary}
+					/>
+					<ListPlugin />
+					<MarkdownShortcutPlugin />
+					<TabIndentationPlugin />
+					<EmojisPlugin />
+					<EmojiPickerPlugin />
+					{isEditorReady && editorContainerRef.current && (
+						<DraggableBlockPlugin
+							anchorElem={editorContainerRef.current}
+						/>
+					)}
+					<OnChangePlugin
+						onChange={(editorState) => {
+							if (onChange) {
+								onChange(JSON.stringify(editorState));
+							}
+						}}
+					/>
+					<HistoryPlugin />
+					<MyAutoLinkPlugin />
+					<MyLinkPlugin />
+					<MyClickableLinkPlugin />
+					<AutoFocusPlugin />
+				</div>
+			</div>
+		</LexicalComposer>
+	);
 }

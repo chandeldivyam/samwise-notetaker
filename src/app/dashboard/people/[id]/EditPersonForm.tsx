@@ -6,15 +6,15 @@ import PersonForm from '../PersonForm';
 import { Person } from '@/types/person';
 
 interface EditPersonFormProps {
-    initialPerson: Person;
+	initialPerson: Person;
 }
 
 export default function EditPersonForm({ initialPerson }: EditPersonFormProps) {
-    return (
-        <PersonForm
-            initialPerson={initialPerson}
-            onSubmit={(values) => updatePerson(initialPerson.id, values)}
-            submitButtonText="Save Changes"
-        />
-    );
+	return (
+		<PersonForm
+			initialPerson={initialPerson}
+			onSubmit={(values) => updatePerson(initialPerson.id, values)}
+			submitButtonText="Save Changes"
+		/>
+	);
 }

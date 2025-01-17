@@ -272,50 +272,48 @@
 	margin-top: 25px;
 	position: fixed;
 	z-index: 1000;
-  }
-  
-  .emoji-menu {
+}
+
+.emoji-menu {
 	width: 250px;
 	max-height: 250px;
 	overflow-y: auto;
-  }
-  
-  .emoji-menu ul {
+}
+
+.emoji-menu ul {
 	list-style: none;
 	margin: 0;
 	padding: 4px;
-  }
-  
-  .emoji-menu .item {
+}
+
+.emoji-menu .item {
 	padding: 4px 8px;
 	border-radius: 4px;
 	cursor: pointer;
-  }
-  
-  .emoji-menu .item:hover {
+}
+
+.emoji-menu .item:hover {
 	background: rgba(0, 0, 0, 0.05);
-  }
-  
-  .emoji-menu .item.selected {
+}
+
+.emoji-menu .item.selected {
 	background: var(--primary-color);
 	color: white;
-  }
-  .editor-container {
+}
+.editor-container {
 	position: relative;
-  }
-  
-  /* Show drag handle on hover */
-  .editor-container:hover .draggable-block-menu {
+}
+
+/* Show drag handle on hover */
+.editor-container:hover .draggable-block-menu {
 	opacity: 1;
-  }
-  
-  /* Handle block selection during drag */
-  .editor-container [data-draggable="true"] {
+}
+
+/* Handle block selection during drag */
+.editor-container [data-draggable='true'] {
 	cursor: grab;
-  }
-  
-  .editor-container [data-draggable="true"]:active {
+}
+
+.editor-container [data-draggable='true']:active {
 	cursor: grabbing;
-  }
-  
-  
+}

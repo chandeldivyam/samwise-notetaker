@@ -115,7 +115,8 @@ body {
 	border-color: var(--border-color) !important;
 }
 .ant-input::placeholder,
-.ant-input-textarea::placeholder {
+.ant-input-textarea::placeholder,
+.ant-upload-hint {
 	color: var(--text-secondary) !important;
 }
 .ant-input:focus,
@@ -126,15 +127,25 @@ body {
 	box-shadow: none !important;
 }
 
-.ant-typography {
-	color: var(--text-primary) !important;
-}
 /* Dark theme specifically for disabled fields */
 :root[data-theme='dark'] .ant-input[disabled],
 :root[data-theme='dark'] .ant-input-textarea[disabled] {
 	background: var(--component-background) !important;
 	color: var(--text-secondary) !important;
 	border-color: var(--border-color) !important;
+}
+
+.ant-select-multiple .ant-select-selection-item {
+	background: var(--component-background) !important;
+	border: 1px solid var(--border-color) !important;
+	color: var(--text-primary) !important;
+}
+
+/* 2. Remove icon inside the pill/chip */
+.ant-select-multiple .ant-select-selection-item-remove .anticon,
+.ant-select-arrow .anticon,
+.ant-typography {
+	color: var(--text-primary) !important;
 }
 
 /* Upload */
@@ -145,15 +156,11 @@ body {
 .ant-upload-drag:hover {
 	border-color: var(--text-primary) !important;
 }
-.ant-upload-drag-icon .anticon {
-	color: var(--text-primary) !important;
-}
+.ant-upload-drag-icon .anticon,
 .ant-upload-text {
 	color: var(--text-primary) !important;
 }
-.ant-upload-hint {
-	color: var(--text-secondary) !important;
-}
+
 .ant-upload-list-item {
 	border-color: var(--border-color) !important;
 	background: var(--component-background) !important;
@@ -275,23 +282,3 @@ body {
 .bg-component-background {
 	background-color: var(--component-background) !important;
 }
-
-.ant-select-multiple {
-	background: var(--component-background) !important;
-	border: 1px solid var(--border-color) !important;
-	color: var(--text-primary) !important;
-  }
-
-  .ant-select-selection-item {
-	color: var(--text-primary) !important;
-  }
-  
-  /* 2. Remove icon inside the pill/chip */
-  .ant-select-multiple .ant-select-selection-item-remove .anticon {
-	color: var(--text-primary) !important;
-  }
-  
-  /* 3. The arrow icon on the right side */
-  .ant-select-arrow .anticon {
-	color: var(--text-primary) !important;
-  }

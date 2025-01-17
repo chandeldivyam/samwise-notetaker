@@ -66,18 +66,16 @@ export async function getS3SignedUrl(key: string) {
 
 export async function deleteS3Object(key: string) {
 	try {
-	  const command = new DeleteObjectCommand({
-		Bucket: process.env.S3_BUCKET_NAME!,
-		Key: key,
-	  });
-  
-	  await s3Client.send(command);
-	  console.log('S3 object deleted:', key);
-	  return { success: true };
+		const command = new DeleteObjectCommand({
+			Bucket: process.env.S3_BUCKET_NAME!,
+			Key: key,
+		});
+
+		await s3Client.send(command);
+		console.log('S3 object deleted:', key);
+		return { success: true };
 	} catch (error) {
-	  console.error('Error deleting S3 object:', error);
-	  return { error: 'Failed to delete S3 object' };
+		console.error('Error deleting S3 object:', error);
+		return { error: 'Failed to delete S3 object' };
 	}
-  }
-  
-  
+}

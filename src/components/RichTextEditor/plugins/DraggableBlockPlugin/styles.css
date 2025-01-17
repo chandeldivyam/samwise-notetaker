@@ -12,7 +12,9 @@
 	left: 0;
 	top: 0;
 	will-change: transform;
-	transition: opacity 0.2s ease, background-color 0.2s ease;
+	transition:
+		opacity 0.2s ease,
+		background-color 0.2s ease;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -22,20 +24,20 @@
 
 /* Icon inside the menu */
 .draggable-block-menu .icon {
-    width: 16px;
-    height: 16px;
-    opacity: 0.7;
-    /* Remove background-image and use mask-image instead */
-    mask-image: url('/draggable-block-menu.svg');
-    -webkit-mask-image: url('/draggable-block-menu.svg');
-    mask-repeat: no-repeat;
-    -webkit-mask-repeat: no-repeat;
-    mask-position: center;
-    -webkit-mask-position: center;
-    mask-size: contain;
-    -webkit-mask-size: contain;
-    /* Use background-color to set the actual color */
-    background-color: var(--text-primary);
+	width: 16px;
+	height: 16px;
+	opacity: 0.7;
+	/* Remove background-image and use mask-image instead */
+	mask-image: url('/draggable-block-menu.svg');
+	-webkit-mask-image: url('/draggable-block-menu.svg');
+	mask-repeat: no-repeat;
+	-webkit-mask-repeat: no-repeat;
+	mask-position: center;
+	-webkit-mask-position: center;
+	mask-size: contain;
+	-webkit-mask-size: contain;
+	/* Use background-color to set the actual color */
+	background-color: var(--text-primary);
 }
 /* Hover & active states */
 .draggable-block-menu:hover {
@@ -57,5 +59,7 @@
 	top: 0;
 	opacity: 0;
 	will-change: transform;
-	transition: opacity 0.2s ease, background-color 0.2s ease;
+	transition:
+		opacity 0.2s ease,
+		background-color 0.2s ease;
 }
