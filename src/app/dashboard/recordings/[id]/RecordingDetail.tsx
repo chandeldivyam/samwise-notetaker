@@ -2,15 +2,14 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Typography, Button, Descriptions, Modal, Spin } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
+import { Typography, Spin, Button } from 'antd';
 import { Recording } from '@/types/recording';
-import { deleteRecording } from '@/lib/actions/recordings';
 import { getS3SignedUrl } from '@/lib/actions/s3';
-import { useMessage, showSuccess, showError } from '@/utils/message';
+import { transcribeRecording } from '@/lib/actions/transcription';
+import { useMessage, showError, showSuccess } from '@/utils/message';
+import { getRecording } from '@/lib/actions/recordings';
 
-const { Title } = Typography;
+const { Title, Paragraph, Text } = Typography;
 
 interface RecordingDetailProps {
 	initialRecording: Recording;
@@ -19,11 +18,18 @@ interface RecordingDetailProps {
 export default function RecordingDetail({
 	initialRecording,
 }: RecordingDetailProps) {
+	const [recording, setRecording] = useState(initialRecording);
 	const [mediaUrl, setMediaUrl] = useState<string | null>(null);
-	const [deleting, setDeleting] = useState(false);
+	const [isTranscribing, setIsTranscribing] = useState(false);
 	const mediaRef = useRef<HTMLAudioElement | HTMLVideoElement>(null);
-	const router = useRouter();
 	const messageApi = useMessage();
+
+	const fetchUpdatedRecording = async (id: string) => {
+		const { data: updatedRecording, error } = await getRecording(id);
+		if (!error && updatedRecording) {
+			setRecording(updatedRecording);
+		}
+	};
 
 	useEffect(() => {
 		const fetchSignedUrl = async () => {
@@ -40,44 +46,6 @@ export default function RecordingDetail({
 		fetchSignedUrl();
 	}, [initialRecording.s3_key]);
 
-	const handleDelete = async () => {
-		Modal.confirm({
-			title: 'Delete Recording',
-			content: 'Are you sure you want to delete this recording?',
-			okText: 'Yes',
-			okType: 'danger',
-			cancelText: 'No',
-			onOk: async () => {
-				setDeleting(true);
-				try {
-					const { error } = await deleteRecording(
-						initialRecording.id
-					);
-					if (error) throw error;
-					showSuccess(messageApi, 'Recording deleted successfully');
-					router.push('/dashboard/recordings');
-				} catch (error) {
-					showError(messageApi, 'Failed to delete recording');
-					console.error('Error:', error);
-				} finally {
-					setDeleting(false);
-				}
-			},
-		});
-	};
-
-	const formatFileSize = (bytes: number) => {
-		if (bytes === 0) return '0 Bytes';
-		const k = 1024;
-		const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-		const i = Math.floor(Math.log(bytes) / Math.log(k));
-		return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-	};
-
-	const formatDate = (dateString: string) => {
-		return new Date(dateString).toLocaleString();
-	};
-
 	if (!mediaUrl) {
 		return (
 			<div className="flex justify-center items-center min-h-[calc(100vh-64px)]">
@@ -88,6 +56,68 @@ export default function RecordingDetail({
 
 	const isVideo = initialRecording.file_type.startsWith('video');
 
+	const handleTranscribe = async () => {
+		setIsTranscribing(true);
+		try {
+			const { error } = await transcribeRecording(recording.id);
+			if (error) {
+				showError(messageApi, 'Failed to transcribe recording');
+				return;
+			}
+
+			// Fetch the updated recording data
+			await fetchUpdatedRecording(recording.id);
+			showSuccess(messageApi, 'Transcription completed');
+		} catch (error) {
+			console.error(error);
+			showError(messageApi, 'An unexpected error occurred');
+		} finally {
+			setIsTranscribing(false);
+		}
+	};
+
+	const renderTranscription = () => {
+		if (!recording.transcription) return null;
+
+		const transcription =
+			recording.transcription.results.channels[0].alternatives[0];
+		return (
+			<div className="mt-8 p-6 rounded-lg shadow bg-component-background">
+				<Title level={3}>Transcription</Title>
+				<div className="overflow-y-auto">
+					{transcription.paragraphs.paragraphs.map(
+						(paragraph, idx) => (
+							<div key={idx} className="mb-4">
+								<Text
+									strong
+								>{`Speaker ${paragraph.speaker}`}</Text>
+								<Paragraph>
+									{paragraph.sentences.map(
+										(sentence, sIdx) => (
+											<span
+												key={sIdx}
+												className="cursor-pointer hover:bg-text-secondary"
+												onClick={() => {
+													if (mediaRef.current) {
+														mediaRef.current.currentTime =
+															sentence.start;
+														mediaRef.current.play();
+													}
+												}}
+											>
+												{sentence.text}{' '}
+											</span>
+										)
+									)}
+								</Paragraph>
+							</div>
+						)
+					)}
+				</div>
+			</div>
+		);
+	};
+
 	return (
 		<div className="min-h-[calc(100vh-64px)] bg-component-background p-8">
 			<div className="max-w-4xl mx-auto">
@@ -95,16 +125,15 @@ export default function RecordingDetail({
 					<Title level={2} className="mb-0">
 						{initialRecording.title}
 					</Title>
-					<div className="space-x-4">
+					{!recording.transcription && (
 						<Button
-							danger
-							icon={<DeleteOutlined />}
-							onClick={handleDelete}
-							loading={deleting}
+							type="primary"
+							onClick={handleTranscribe}
+							loading={isTranscribing}
 						>
-							Delete
+							Transcribe
 						</Button>
-					</div>
+					)}
 				</div>
 
 				<div className="mb-8">
@@ -124,27 +153,7 @@ export default function RecordingDetail({
 						/>
 					)}
 				</div>
-
-				<Descriptions bordered column={1}>
-					<Descriptions.Item label="Description">
-						{initialRecording.description || 'No description'}
-					</Descriptions.Item>
-					<Descriptions.Item label="File Name">
-						{initialRecording.original_filename}
-					</Descriptions.Item>
-					<Descriptions.Item label="File Type">
-						{initialRecording.file_type}
-					</Descriptions.Item>
-					<Descriptions.Item label="File Size">
-						{formatFileSize(initialRecording.file_size)}
-					</Descriptions.Item>
-					<Descriptions.Item label="Created At">
-						{formatDate(initialRecording.created_at)}
-					</Descriptions.Item>
-					<Descriptions.Item label="Last Updated">
-						{formatDate(initialRecording.updated_at)}
-					</Descriptions.Item>
-				</Descriptions>
+				{renderTranscription()}
 			</div>
 		</div>
 	);

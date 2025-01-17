@@ -1,6 +1,7 @@
 'use client';
 
 import './editor.css';
+import { useRef, useEffect, useState } from 'react';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
@@ -16,6 +17,9 @@ import { MarkdownShortcutPlugin } from '@lexical/react/LexicalMarkdownShortcutPl
 import MyAutoLinkPlugin from './plugins/AutoLinkPlugin';
 import MyLinkPlugin from './plugins/LinkPlugin';
 import MyClickableLinkPlugin from './plugins/ClickableLinkPlugin';
+import EmojisPlugin from './plugins/EmojisPlugin';
+import EmojiPickerPlugin from './plugins/EmojiPickerPlugin';
+import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
 
 interface RichTextEditorProps {
 	content?: string;
@@ -30,6 +34,9 @@ export default function RichTextEditor({
 	placeholder = 'Start writing...',
 	value,
 }: RichTextEditorProps) {
+	const editorContainerRef = useRef<HTMLDivElement>(null);
+	const [isEditorReady, setIsEditorReady] = useState(false);
+
 	const initialConfig = {
 		...editorConfig,
 		editorState: value || content,
@@ -38,9 +45,19 @@ export default function RichTextEditor({
 		},
 	};
 
+	useEffect(() => {
+		if (editorContainerRef.current) {
+			setIsEditorReady(true);
+		}
+	}, []);
+
 	return (
 		<LexicalComposer initialConfig={initialConfig}>
-			<div className="editor-container">
+			<div
+				className="editor-container"
+				ref={editorContainerRef}
+				style={{ position: 'relative' }}
+			>
 				<ToolbarPlugin />
 				<div className="editor-inner">
 					<RichTextPlugin
@@ -57,6 +74,13 @@ export default function RichTextEditor({
 					<ListPlugin />
 					<MarkdownShortcutPlugin />
 					<TabIndentationPlugin />
+					<EmojisPlugin />
+					<EmojiPickerPlugin />
+					{isEditorReady && editorContainerRef.current && (
+						<DraggableBlockPlugin
+							anchorElem={editorContainerRef.current}
+						/>
+					)}
 					<OnChangePlugin
 						onChange={(editorState) => {
 							if (onChange) {

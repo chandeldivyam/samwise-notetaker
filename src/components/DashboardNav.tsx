@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { Layout, Dropdown, Button } from 'antd';
 import {
 	MenuOutlined,
@@ -10,6 +10,7 @@ import {
 	LogoutOutlined,
 	FileTextOutlined,
 	VideoCameraOutlined,
+	SmileOutlined,
 } from '@ant-design/icons';
 import { useRouter, usePathname } from 'next/navigation';
 import { MoonOutlined, SunFilled } from '@ant-design/icons';
@@ -22,7 +23,20 @@ export default function DashboardNav() {
 	const router = useRouter();
 	const pathname = usePathname();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const menuButtonRef = useRef<HTMLButtonElement>(null);
 	const { theme, toggleTheme } = useTheme();
+	const [hasPrefetched, setHasPrefetched] = useState(false);
+
+	const routes = useMemo(
+		() => [
+			'/dashboard',
+			'/dashboard/notes',
+			'/dashboard/recordings',
+			'/dashboard/settings',
+			'/dashboard/people',
+		],
+		[]
+	);
 
 	const handleLogout = async () => {
 		const { error } = await signOut();
@@ -31,18 +45,17 @@ export default function DashboardNav() {
 		}
 	};
 
-	useEffect(() => {
-		const routes = [
-			'/dashboard',
-			'/dashboard/notes',
-			'/dashboard/recordings',
-			'/dashboard/settings',
-		];
-
+	const handleMenuMouseEnter = () => {
+		if (hasPrefetched) return;
 		routes.forEach((route) => {
 			router.prefetch(route);
 		});
-	}, []);
+		setHasPrefetched(true);
+	};
+
+	const handleMenuMouseLeave = () => {
+		setHasPrefetched(false);
+	};
 
 	const menuItems = [
 		{
@@ -71,6 +84,15 @@ export default function DashboardNav() {
 				router.push('/dashboard/recordings');
 			},
 			path: '/dashboard/recordings',
+		},
+		{
+			key: 'people',
+			icon: <SmileOutlined />,
+			label: 'People',
+			onClick: () => {
+				router.push('/dashboard/people');
+			},
+			path: '/dashboard/people',
 		},
 		{
 			key: 'settings',
@@ -123,9 +145,12 @@ export default function DashboardNav() {
 					onOpenChange={setIsMenuOpen}
 				>
 					<Button
+						ref={menuButtonRef}
 						type="text"
 						icon={<MenuOutlined className="text-text-primary" />}
 						className="mr-4"
+						onMouseEnter={handleMenuMouseEnter}
+						onMouseLeave={handleMenuMouseLeave}
 					/>
 				</Dropdown>
 				<span className="text-xl font-semibold text-text-primary">

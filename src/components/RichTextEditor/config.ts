@@ -6,6 +6,7 @@ import { LinkNode, AutoLinkNode } from '@lexical/link';
 import { ParagraphNode, TextNode } from 'lexical';
 import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode';
 import { CodeNode, CodeHighlightNode } from '@lexical/code';
+import { EmojiNode } from './nodes/EmojiNode';
 
 export const editorConfig: InitialConfigType = {
 	namespace: 'NotesEditor',
@@ -22,6 +23,7 @@ export const editorConfig: InitialConfigType = {
 		CodeNode,
 		CodeHighlightNode,
 		AutoLinkNode,
+		EmojiNode,
 	],
 	onError: (error: Error) => {
 		console.error(error);

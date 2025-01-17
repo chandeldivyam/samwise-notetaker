@@ -1,7 +1,30 @@
 // src/app/dashboard/recordings/[id]/page.tsx
+import { Suspense } from 'react';
 import { getRecording } from '@/lib/actions/recordings';
-import RecordingDetail from './RecordingDetail';
-import { redirect } from 'next/navigation';
+import RecordingDetailPage from './RecordingDetailPage';
+import { RecordingDetailLoading } from './RecordingDetailLoading';
+import { notFound } from 'next/navigation';
+
+// Generate metadata for the page
+export async function generateMetadata({
+	params,
+}: {
+	params: Promise<{ id: string }>;
+}) {
+	const resolvedParams = await params;
+	const { data: recording } = await getRecording(resolvedParams.id);
+
+	if (!recording) {
+		return {
+			title: 'Recording Not Found',
+		};
+	}
+
+	return {
+		title: `${recording.title} - Recording`,
+		description: recording.description || 'Recording detail page',
+	};
+}
 
 export default async function RecordingPage({
 	params,
@@ -12,8 +35,12 @@ export default async function RecordingPage({
 	const { data: recording, error } = await getRecording(resolvedParams.id);
 
 	if (error || !recording) {
-		redirect('/dashboard/recordings');
+		notFound();
 	}
 
-	return <RecordingDetail initialRecording={recording} />;
+	return (
+		<Suspense fallback={<RecordingDetailLoading />}>
+			<RecordingDetailPage initialRecording={recording} />
+		</Suspense>
+	);
 }

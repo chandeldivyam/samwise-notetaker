@@ -1,8 +1,9 @@
 .editor-container {
-	border: 1px solid var(--border-color);
+	/* border: 1px solid var(--border-color); */
 	background: var(--component-background);
 	border-radius: 4px;
 	margin-bottom: 20px;
+	padding-left: 25px;
 	position: relative;
 	max-height: calc(100vh - 250px); /* Adjust this value based on your needs */
 	display: flex;
@@ -68,7 +69,7 @@
 	gap: 4px;
 	margin-bottom: 1px;
 	padding: 4px;
-	border-bottom: 1px solid var(--border-color);
+	/* border-bottom: 1px solid var(--border-color); */
 	background: var(--component-background);
 }
 
@@ -262,4 +263,57 @@
 	outline: none;
 	background-color: rgba(var(--text-primary), 0.1);
 	border-radius: 2px;
+}
+
+.typeahead-popover {
+	background: var(--component-background);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	border-radius: 4px;
+	margin-top: 25px;
+	position: fixed;
+	z-index: 1000;
+}
+
+.emoji-menu {
+	width: 250px;
+	max-height: 250px;
+	overflow-y: auto;
+}
+
+.emoji-menu ul {
+	list-style: none;
+	margin: 0;
+	padding: 4px;
+}
+
+.emoji-menu .item {
+	padding: 4px 8px;
+	border-radius: 4px;
+	cursor: pointer;
+}
+
+.emoji-menu .item:hover {
+	background: rgba(0, 0, 0, 0.05);
+}
+
+.emoji-menu .item.selected {
+	background: var(--primary-color);
+	color: white;
+}
+.editor-container {
+	position: relative;
+}
+
+/* Show drag handle on hover */
+.editor-container:hover .draggable-block-menu {
+	opacity: 1;
+}
+
+/* Handle block selection during drag */
+.editor-container [data-draggable='true'] {
+	cursor: grab;
+}
+
+.editor-container [data-draggable='true']:active {
+	cursor: grabbing;
 }

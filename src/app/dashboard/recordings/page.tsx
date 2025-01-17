@@ -1,6 +1,6 @@
 // src/app/dashboard/recordings/page.tsx
 import { getRecordings } from '@/lib/actions/recordings';
-import RecordingsList from './RecordingsList';
+import RecordingsList from './components/RecordingsList';
 
 export default async function RecordingsPage() {
 	const { data: recordings, error } = await getRecordings();
