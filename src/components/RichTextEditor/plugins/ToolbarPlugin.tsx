@@ -11,6 +11,7 @@ import {
 	CAN_UNDO_COMMAND,
 	CAN_REDO_COMMAND,
 } from 'lexical';
+import { INSERT_IMAGE_COMMAND } from './ImagePlugin';
 import { $createParagraphNode } from 'lexical';
 import { $createHeadingNode } from '@lexical/rich-text';
 import { $setBlocksType } from '@lexical/selection';
@@ -31,6 +32,7 @@ import {
 	AlignCenterOutlined,
 	AlignRightOutlined,
 	CopyOutlined,
+	PictureOutlined,
 } from '@ant-design/icons';
 import { BLOCK_TYPE_TO_BLOCKTYPE } from '../config';
 import { exportMarkdown } from '../utils/markdownUtils';
@@ -255,6 +257,22 @@ export default function ToolbarPlugin() {
 					type="text"
 					icon={<CopyOutlined />}
 					onClick={copyToClipboard}
+				/>
+				<Button
+					type="text"
+					icon={<PictureOutlined />}
+					onClick={() => {
+						const input = document.createElement('input');
+						input.type = 'file';
+						input.accept = 'image/*';
+						input.onchange = async () => {
+						const file = input.files?.[0];
+						if (file) {
+							editor.dispatchCommand(INSERT_IMAGE_COMMAND, { file });
+						}
+						};
+						input.click();
+					}}
 				/>
 			</Space>
 		</div>
