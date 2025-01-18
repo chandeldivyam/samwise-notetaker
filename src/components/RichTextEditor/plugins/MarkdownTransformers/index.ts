@@ -48,7 +48,7 @@ export const IMAGE: TextMatchTransformer = {
         if (!$isImageNode(node)) {
           return null;
         }
-        return `![${node.__altText}](${node.__src})`;
+        return `![${node.__altText}](${node.__src})\n<!--description: ${node.__description}-->\n`;
     },
   importRegExp: /!\[([^\]]*)\]\(([^)]+)\)/,
   regExp: /!\[([^\]]*)\]\(([^)]+)\)$/,
