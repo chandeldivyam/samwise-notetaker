@@ -7,6 +7,7 @@ import {
 	TEXT_MATCH_TRANSFORMERS,
 } from '@lexical/markdown';
 import { $createEmojiNode, $isEmojiNode } from '../../nodes/EmojiNode';
+import { $isImageNode, ImageNode } from '../../nodes/ImageNode';
 import EMOJI_LIST from '../../../../constants/emoji-list';
 
 // Function to find an emoji by its name
@@ -40,8 +41,32 @@ export const EMOJI: TextMatchTransformer = {
 	type: 'text-match',
 };
 
+// Custom transformer for Image nodes
+export const IMAGE: TextMatchTransformer = {
+	dependencies: [],
+	export: (node) => {
+		if (!$isImageNode(node)) return null;
+		const desc = node.__description
+			? `[image_description: ${node.__description}]`
+			: '';
+		return `![${node.__altText}](${node.__src})${desc}`;
+	},
+	// Allow description to be optional. The third capture group will be undefined if not present.
+	importRegExp:
+		/!\[([^\]]*)\]\(([^)]+)\)(?:\[image_description:\s*([^\]]*)\])?/,
+	regExp: /!\[([^\]]*)\]\(([^)]+)\)(?:\[image_description:\s*([^\]]*)\])?$/,
+	replace: (textNode, match) => {
+		const [, altText, src, description] = match;
+		const imageNode = new ImageNode(src, altText, description || '');
+		textNode.replace(imageNode);
+	},
+	trigger: '!',
+	type: 'text-match',
+};
+
 export const TRANSFORMERS = [
 	EMOJI,
+	IMAGE,
 	...ELEMENT_TRANSFORMERS,
 	...TEXT_FORMAT_TRANSFORMERS,
 	...TEXT_MATCH_TRANSFORMERS,

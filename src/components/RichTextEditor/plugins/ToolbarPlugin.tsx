@@ -1,16 +1,8 @@
 'use client';
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import {
-	$getSelection,
-	$isRangeSelection,
-	FORMAT_TEXT_COMMAND,
-	FORMAT_ELEMENT_COMMAND,
-	UNDO_COMMAND,
-	REDO_COMMAND,
-	CAN_UNDO_COMMAND,
-	CAN_REDO_COMMAND,
-} from 'lexical';
+import { $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND } from 'lexical';
+import { INSERT_IMAGE_COMMAND } from './ImagePlugin';
 import { $createParagraphNode } from 'lexical';
 import { $createHeadingNode } from '@lexical/rich-text';
 import { $setBlocksType } from '@lexical/selection';
@@ -25,12 +17,8 @@ import {
 	ItalicOutlined,
 	UnderlineOutlined,
 	StrikethroughOutlined,
-	UndoOutlined,
-	RedoOutlined,
-	AlignLeftOutlined,
-	AlignCenterOutlined,
-	AlignRightOutlined,
 	CopyOutlined,
+	PictureOutlined,
 } from '@ant-design/icons';
 import { BLOCK_TYPE_TO_BLOCKTYPE } from '../config';
 import { exportMarkdown } from '../utils/markdownUtils';
@@ -43,8 +31,6 @@ export default function ToolbarPlugin() {
 	const [isItalic, setIsItalic] = useState(false);
 	const [isUnderline, setIsUnderline] = useState(false);
 	const [isStrikethrough, setIsStrikethrough] = useState(false);
-	const [canUndo, setCanUndo] = useState(false);
-	const [canRedo, setCanRedo] = useState(false);
 	const messageApi = useMessage();
 
 	const updateToolbar = useCallback(() => {
@@ -137,28 +123,6 @@ export default function ToolbarPlugin() {
 		});
 	}, [editor, updateToolbar]);
 
-	useEffect(() => {
-		return editor.registerCommand(
-			CAN_UNDO_COMMAND,
-			(payload: boolean) => {
-				setCanUndo(payload);
-				return false;
-			},
-			1
-		);
-	}, [editor]);
-
-	useEffect(() => {
-		return editor.registerCommand(
-			CAN_REDO_COMMAND,
-			(payload: boolean) => {
-				setCanRedo(payload);
-				return false;
-			},
-			1
-		);
-	}, [editor]);
-
 	return (
 		<div className="toolbar">
 			<Space>
@@ -175,22 +139,6 @@ export default function ToolbarPlugin() {
 							label,
 						})
 					)}
-				/>
-				<Button
-					type={canUndo ? 'text' : 'text'}
-					disabled={!canUndo}
-					icon={<UndoOutlined />}
-					onClick={() => {
-						editor.dispatchCommand(UNDO_COMMAND, undefined);
-					}}
-				/>
-				<Button
-					type={canRedo ? 'text' : 'text'}
-					disabled={!canRedo}
-					icon={<RedoOutlined />}
-					onClick={() => {
-						editor.dispatchCommand(REDO_COMMAND, undefined);
-					}}
 				/>
 				<Button
 					type={isBold ? 'primary' : 'text'}
@@ -228,33 +176,26 @@ export default function ToolbarPlugin() {
 				/>
 				<Button
 					type="text"
-					icon={<AlignLeftOutlined />}
-					onClick={() => {
-						editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left');
-					}}
-				/>
-				<Button
-					type="text"
-					icon={<AlignCenterOutlined />}
-					onClick={() => {
-						editor.dispatchCommand(
-							FORMAT_ELEMENT_COMMAND,
-							'center'
-						);
-					}}
-				/>
-				<Button
-					type="text"
-					icon={<AlignRightOutlined />}
-					onClick={() => {
-						editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right');
-					}}
-				/>
-
-				<Button
-					type="text"
 					icon={<CopyOutlined />}
 					onClick={copyToClipboard}
+				/>
+				<Button
+					type="text"
+					icon={<PictureOutlined />}
+					onClick={() => {
+						const input = document.createElement('input');
+						input.type = 'file';
+						input.accept = 'image/*';
+						input.onchange = async () => {
+							const file = input.files?.[0];
+							if (file) {
+								editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
+									file,
+								});
+							}
+						};
+						input.click();
+					}}
 				/>
 			</Space>
 		</div>

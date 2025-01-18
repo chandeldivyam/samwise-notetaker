@@ -20,6 +20,8 @@ import MyClickableLinkPlugin from './plugins/ClickableLinkPlugin';
 import EmojisPlugin from './plugins/EmojisPlugin';
 import EmojiPickerPlugin from './plugins/EmojiPickerPlugin';
 import DraggableBlockPlugin from './plugins/DraggableBlockPlugin';
+import { ImagePlugin } from './plugins/ImagePlugin';
+import DragDropPlugin from './plugins/DragDropPlugin';
 
 interface RichTextEditorProps {
 	content?: string;
@@ -81,6 +83,7 @@ export default function RichTextEditor({
 							anchorElem={editorContainerRef.current}
 						/>
 					)}
+					<ImagePlugin />
 					<OnChangePlugin
 						onChange={(editorState) => {
 							if (onChange) {
@@ -93,6 +96,7 @@ export default function RichTextEditor({
 					<MyLinkPlugin />
 					<MyClickableLinkPlugin />
 					<AutoFocusPlugin />
+					<DragDropPlugin />
 				</div>
 			</div>
 		</LexicalComposer>

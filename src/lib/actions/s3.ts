@@ -79,3 +79,7 @@ export async function deleteS3Object(key: string) {
 		return { error: 'Failed to delete S3 object' };
 	}
 }
+
+export async function getPublicUrl(key: string) {
+	return `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+}
