@@ -1,16 +1,7 @@
 'use client';
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import {
-	$getSelection,
-	$isRangeSelection,
-	FORMAT_TEXT_COMMAND,
-	FORMAT_ELEMENT_COMMAND,
-	UNDO_COMMAND,
-	REDO_COMMAND,
-	CAN_UNDO_COMMAND,
-	CAN_REDO_COMMAND,
-} from 'lexical';
+import { $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND } from 'lexical';
 import { INSERT_IMAGE_COMMAND } from './ImagePlugin';
 import { $createParagraphNode } from 'lexical';
 import { $createHeadingNode } from '@lexical/rich-text';
@@ -26,11 +17,6 @@ import {
 	ItalicOutlined,
 	UnderlineOutlined,
 	StrikethroughOutlined,
-	UndoOutlined,
-	RedoOutlined,
-	AlignLeftOutlined,
-	AlignCenterOutlined,
-	AlignRightOutlined,
 	CopyOutlined,
 	PictureOutlined,
 } from '@ant-design/icons';
@@ -45,8 +31,6 @@ export default function ToolbarPlugin() {
 	const [isItalic, setIsItalic] = useState(false);
 	const [isUnderline, setIsUnderline] = useState(false);
 	const [isStrikethrough, setIsStrikethrough] = useState(false);
-	const [canUndo, setCanUndo] = useState(false);
-	const [canRedo, setCanRedo] = useState(false);
 	const messageApi = useMessage();
 
 	const updateToolbar = useCallback(() => {
@@ -139,28 +123,6 @@ export default function ToolbarPlugin() {
 		});
 	}, [editor, updateToolbar]);
 
-	useEffect(() => {
-		return editor.registerCommand(
-			CAN_UNDO_COMMAND,
-			(payload: boolean) => {
-				setCanUndo(payload);
-				return false;
-			},
-			1
-		);
-	}, [editor]);
-
-	useEffect(() => {
-		return editor.registerCommand(
-			CAN_REDO_COMMAND,
-			(payload: boolean) => {
-				setCanRedo(payload);
-				return false;
-			},
-			1
-		);
-	}, [editor]);
-
 	return (
 		<div className="toolbar">
 			<Space>
@@ -225,10 +187,12 @@ export default function ToolbarPlugin() {
 						input.type = 'file';
 						input.accept = 'image/*';
 						input.onchange = async () => {
-						const file = input.files?.[0];
-						if (file) {
-							editor.dispatchCommand(INSERT_IMAGE_COMMAND, { file });
-						}
+							const file = input.files?.[0];
+							if (file) {
+								editor.dispatchCommand(INSERT_IMAGE_COMMAND, {
+									file,
+								});
+							}
 						};
 						input.click();
 					}}

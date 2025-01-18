@@ -45,25 +45,28 @@ export const EMOJI: TextMatchTransformer = {
 export const IMAGE: TextMatchTransformer = {
 	dependencies: [],
 	export: (node) => {
-	  if (!$isImageNode(node)) return null;
-	  const desc = node.__description ? `[image_description: ${node.__description}]` : '';
-	  return `![${node.__altText}](${node.__src})${desc}`;
+		if (!$isImageNode(node)) return null;
+		const desc = node.__description
+			? `[image_description: ${node.__description}]`
+			: '';
+		return `![${node.__altText}](${node.__src})${desc}`;
 	},
 	// Allow description to be optional. The third capture group will be undefined if not present.
-	importRegExp: /!\[([^\]]*)\]\(([^)]+)\)(?:\[image_description:\s*([^\]]*)\])?/,
+	importRegExp:
+		/!\[([^\]]*)\]\(([^)]+)\)(?:\[image_description:\s*([^\]]*)\])?/,
 	regExp: /!\[([^\]]*)\]\(([^)]+)\)(?:\[image_description:\s*([^\]]*)\])?$/,
 	replace: (textNode, match) => {
-	  const [, altText, src, description] = match;
-	  const imageNode = new ImageNode(src, altText, description || '');
-	  textNode.replace(imageNode);
+		const [, altText, src, description] = match;
+		const imageNode = new ImageNode(src, altText, description || '');
+		textNode.replace(imageNode);
 	},
 	trigger: '!',
 	type: 'text-match',
-  };
+};
 
 export const TRANSFORMERS = [
-  EMOJI,
-  IMAGE,
+	EMOJI,
+	IMAGE,
 	...ELEMENT_TRANSFORMERS,
 	...TEXT_FORMAT_TRANSFORMERS,
 	...TEXT_MATCH_TRANSFORMERS,
