@@ -136,7 +136,6 @@ export default function EditNoteForm({ initialNote }: EditNoteFormProps) {
 							onClick={handleDelete}
 							loading={deleting}
 							disabled={saving}
-							block={window.innerWidth < 640}
 							className="w-full max-w-[200px]"
 						>
 							Delete
@@ -146,7 +145,6 @@ export default function EditNoteForm({ initialNote }: EditNoteFormProps) {
 							onClick={form.submit}
 							loading={saving}
 							disabled={!isDirty || deleting}
-							block={window.innerWidth < 640}
 							className="w-full max-w-[200px]"
 						>
 							Save
