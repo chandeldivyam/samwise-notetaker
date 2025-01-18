@@ -1,4 +1,3 @@
-// src/components/RichTextEditor/plugins/ImagePlugin.tsx
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $insertNodes, createCommand, LexicalCommand, COMMAND_PRIORITY_EDITOR } from 'lexical';
 import { useCallback, useEffect } from 'react';
@@ -20,8 +19,20 @@ export function ImagePlugin(): null {
   const messageApi = useMessage();
 
   const handleImageUpload = useCallback(async (file: File) => {
+    // Create a placeholder URL for the loading state
+    const placeholderNode = $createImageNode({
+      altText: file.name,
+      src: '', // Empty src since we're showing a loading state
+      isLoading: true,
+      uploadProgress: 0,
+    });
+
+    // Insert the placeholder immediately
+    editor.update(() => {
+      $insertNodes([placeholderNode]);
+    });
+
     try {
-      // Generate upload URL
       const { user, error } = await getCurrentUser();
       if (error) throw new Error('Failed to get user');
       if (!user) throw new Error('No user found');
@@ -29,27 +40,29 @@ export function ImagePlugin(): null {
       const { url, key } = await generateUploadUrl(user.id, file.type, 'images');
       if (!url || !key) throw new Error('Failed to generate upload URL');
 
-      // Upload file using our utility
+      // Upload file with progress updates
       await uploadFileWithProgress(url, file, (progress) => {
-        // You can handle progress updates here if needed
-        console.log(`Upload progress: ${progress}%`);
+        editor.update(() => {
+          placeholderNode.setUploadProgress(progress);
+        });
       });
 
-      // Get public URL using our new function
+      // Get public URL
       const imageUrl = await getPublicUrl(key);
 
-      // Insert the image node
-    //   TODO: Implement a description using llm prompting and image description. We can either keep it in alt text or as description in the image node
+      // Update the placeholder with the actual image
       editor.update(() => {
-        const imageNode = $createImageNode({
-          altText: file.name,
-          src: imageUrl,
-        });
-        $insertNodes([imageNode]);
+        placeholderNode.setLoading(false);
+        placeholderNode.setSrc(imageUrl);
       });
     } catch (error) {
       console.error('Error uploading image:', error);
       showError(messageApi, 'Failed to upload image');
+      
+      // Remove the placeholder on error
+      editor.update(() => {
+        placeholderNode.remove();
+      });
     }
   }, [editor]);
 

@@ -179,22 +179,6 @@ export default function ToolbarPlugin() {
 					)}
 				/>
 				<Button
-					type={canUndo ? 'text' : 'text'}
-					disabled={!canUndo}
-					icon={<UndoOutlined />}
-					onClick={() => {
-						editor.dispatchCommand(UNDO_COMMAND, undefined);
-					}}
-				/>
-				<Button
-					type={canRedo ? 'text' : 'text'}
-					disabled={!canRedo}
-					icon={<RedoOutlined />}
-					onClick={() => {
-						editor.dispatchCommand(REDO_COMMAND, undefined);
-					}}
-				/>
-				<Button
 					type={isBold ? 'primary' : 'text'}
 					icon={<BoldOutlined />}
 					onClick={() => {
@@ -228,31 +212,6 @@ export default function ToolbarPlugin() {
 						);
 					}}
 				/>
-				<Button
-					type="text"
-					icon={<AlignLeftOutlined />}
-					onClick={() => {
-						editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left');
-					}}
-				/>
-				<Button
-					type="text"
-					icon={<AlignCenterOutlined />}
-					onClick={() => {
-						editor.dispatchCommand(
-							FORMAT_ELEMENT_COMMAND,
-							'center'
-						);
-					}}
-				/>
-				<Button
-					type="text"
-					icon={<AlignRightOutlined />}
-					onClick={() => {
-						editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right');
-					}}
-				/>
-
 				<Button
 					type="text"
 					icon={<CopyOutlined />}
