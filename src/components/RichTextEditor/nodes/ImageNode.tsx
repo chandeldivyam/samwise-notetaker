@@ -1,9 +1,10 @@
 import type { DOMConversionMap, DOMExportOutput, EditorConfig, LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical';
 import { $applyNodeReplacement, DecoratorNode, $getNodeByKey } from 'lexical';
 import * as React from 'react';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-
+import { Input } from 'antd';
+const { TextArea } = Input;
 export interface ImagePayload {
   src: string;
   altText: string;
@@ -11,6 +12,7 @@ export interface ImagePayload {
   key?: NodeKey;
   isLoading?: boolean;
   uploadProgress?: number;
+  width?: number;
 }
 
 export type SerializedImageNode = Spread<
@@ -20,6 +22,7 @@ export type SerializedImageNode = Spread<
     description?: string;
     isLoading?: boolean;
     uploadProgress?: number;
+    width?: number;
   },
   SerializedLexicalNode
 >;
@@ -30,6 +33,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   __description: string;
   __isLoading: boolean;
   __uploadProgress: number;
+  __width: number;
 
   static getType(): string {
     return 'image';
@@ -42,17 +46,19 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       node.__description,
       node.__isLoading, 
       node.__uploadProgress, 
-      node.__key
+      node.__key,
+      node.__width
     );
   }
 
-  constructor(src: string, altText: string, description: string = '', isLoading: boolean = false, uploadProgress: number = 0, key?: NodeKey) {
+  constructor(src: string, altText: string, description: string = '', isLoading: boolean = false, uploadProgress: number = 0, key?: NodeKey, width: number = 400) {
     super(key);
     this.__src = src;
     this.__altText = altText;
     this.__description = description;
     this.__isLoading = isLoading;
     this.__uploadProgress = uploadProgress;
+    this.__width = width;
   }
 
   createDOM(config: EditorConfig): HTMLElement {
@@ -92,6 +98,12 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     self.__src = src;
   }
 
+  setWidth(width: number): void {
+    const writable = this.getWritable();
+    writable.__width = width;
+  }
+
+
   exportJSON(): SerializedImageNode {
     return {
       type: 'image',
@@ -100,6 +112,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
       description: this.__description,
       isLoading: this.__isLoading,
       uploadProgress: this.__uploadProgress,
+      width: this.__width,
       version: 1,
     };
   }
@@ -169,95 +182,175 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
     altText={this.__altText} 
     description={this.__description}
     nodeKey={this.__key}
+    width={this.__width}
   />;
   }
 }
 
-function ImageComponent({ 
-  src, 
-  altText, 
-  description, 
-  nodeKey 
-}: { 
-  src: string; 
-  altText: string; 
+function ImageComponent({
+  src,
+  altText,
+  description,
+  nodeKey,
+  width: initialWidth = 400,
+}: {
+  src: string;
+  altText: string;
   description: string;
   nodeKey: string;
+  width?: number;
 }) {
   const [editor] = useLexicalComposerContext();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedDescription, setEditedDescription] = useState(description);
+  const [isResizing, setIsResizing] = useState(false);
+  const [width, setWidth] = useState(initialWidth);
+  const [showCaption, setShowCaption] = useState(false);
+  const [captionText, setCaptionText] = useState(description);
+  const [isEditingCaption, setIsEditingCaption] = useState(false);
+  const imageRef = useRef<HTMLImageElement>(null);
+  
+  // Handle resize
+  const handleResizeStart = useCallback(
+    (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      event.preventDefault();
+      setIsResizing(true);
+    },
+    [],
+  );
 
-  const handleDescriptionSave = useCallback(() => {
+  const handleResizeEnd = useCallback(() => {
+    setIsResizing(false);
+    // Update node width in editor
     editor.update(() => {
       const node = $getNodeByKey(nodeKey);
       if (node instanceof ImageNode) {
-        node.setDescription(editedDescription);
+        node.setWidth(width);
       }
     });
-    setIsEditing(false);
-  }, [editor, editedDescription, nodeKey]);
+  }, [editor, nodeKey, width]);
 
-  const handleCancel = useCallback(() => {
-    setEditedDescription(description);
-    setIsEditing(false);
-  }, [description]);
+  const handleResize = useCallback((event: MouseEvent) => {
+    if (isResizing && imageRef.current) {
+      event.preventDefault();
+      const newWidth = Math.max(100, Math.min(1000, event.clientX - imageRef.current.getBoundingClientRect().left));
+      setWidth(newWidth);
+    }
+  }, [isResizing]);
+
+  const handleCaptionChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newCaption = event.target.value;
+    setCaptionText(newCaption);
+    editor.update(() => {
+      const node = $getNodeByKey(nodeKey);
+      if (node instanceof ImageNode) {
+        node.setDescription(newCaption);
+      }
+    });
+  }, [editor, nodeKey]);
+
+  const handleCaptionBlur = useCallback(() => {
+    setIsEditingCaption(false);
+  }, []);
+
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleResize);
+      document.addEventListener('mouseup', handleResizeEnd);
+      return () => {
+        document.removeEventListener('mousemove', handleResize);
+        document.removeEventListener('mouseup', handleResizeEnd);
+      };
+    }
+  }, [isResizing, handleResize, handleResizeEnd]);
 
   return (
-    <div>
-      <img 
-        src={src} 
-        alt={altText} 
-        className="max-w-[80%] h-auto rounded-lg"
-        draggable="false"
-      />
-      <div className="mt-5 max-w-[80%]">
-        {isEditing ? (
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={editedDescription}
-              onChange={(e) => setEditedDescription(e.target.value)}
-              className="flex-1 px-2 py-1 rounded text-sm bg-component-background"
-              placeholder="Add a description..."
-              // Prevent form submission when pressing enter
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleDescriptionSave();
-                }
-              }}
-            />
-            <button
-            type="button"
-              onClick={handleDescriptionSave}
-              className="px-3 py-1 text-sm"
-            >
-              Save
-            </button>
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="px-3 py-1 text-sm"
-            >
-              Cancel
-            </button>
-          </div>
-        ) : (
-          <div 
-            className="flex justify-between items-center text-sm text-text-primary cursor-pointer rounded"
-            onClick={() => setIsEditing(true)}
-          >
-            <span>{description || 'Add a description...'}</span>
-            <button type="button" className="text-blue-500 hover:text-blue-600">
-              Edit
-            </button>
+    <div className="relative group" style={{ width: width }}>
+      {/* Image and Resize Section */}
+      <div 
+        className={`relative ${isResizing ? 'select-none' : ''}`}
+        style={{ width: '100%' }}
+      >
+        <img
+          ref={imageRef}
+          src={src}
+          alt={altText}
+          className="max-w-full h-auto rounded-lg"
+          draggable="false"
+          style={{ width: '100%' }}
+        />
+        
+        {/* Resize handle */}
+        <div
+          className="absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-blue-500/20"
+          onMouseDown={handleResizeStart}
+        />
+        
+        {/* Image size indicator while resizing */}
+        {isResizing && (
+          <div className="absolute top-0 right-0 bg-black/75 text-white px-2 py-1 text-sm rounded-bl">
+            {Math.round(width)}px
           </div>
         )}
+      </div>
+  
+      {/* Caption Section */}
+      <div className="mt-2 relative">
+        {captionText ? (
+          // Show caption text with edit/remove options
+          <div 
+            className="group/caption relative text-sm text-text-primary"
+            onDoubleClick={() => setIsEditingCaption(true)}
+          >
+            <p className="py-1">{captionText}</p>
+          </div>
+        ) : (
+          // Show add caption button
+          <button
+            className="text-sm text-text-secondary hover:text-primary-color opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={() => {
+              setShowCaption(true);
+              setIsEditingCaption(true);
+            }}
+            type='button'
+          >
+            Add Description
+          </button>
+        )}
+  
+        {/* Caption Editor */}
+        {isEditingCaption && (
+  <div className="absolute inset-0 z-10">
+    <TextArea
+      className="w-full rounded border border-primary-color"
+      placeholder="Describe this image..."
+      value={captionText}
+      onChange={handleCaptionChange}
+      onBlur={handleCaptionBlur}
+      autoSize={{ minRows: 1, maxRows: 6 }} // This enables auto-expanding
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          handleCaptionBlur();
+        }
+        if (e.key === 'Escape') {
+          handleCaptionBlur();
+        }
+      }}
+      autoFocus
+      style={{
+        fontSize: '14px',
+        padding: '8px 12px',
+        resize: 'vertical', // Allows manual resizing
+        minHeight: '30px',
+        maxHeight: '200px'
+      }}
+    />
+  </div>
+)}
       </div>
     </div>
   );
 }
+
 
 
 function convertImageElement(domNode: Node): null | { node: ImageNode } {
