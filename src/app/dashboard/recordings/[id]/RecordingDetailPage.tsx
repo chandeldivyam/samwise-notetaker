@@ -4,7 +4,6 @@ import { Card } from 'antd';
 import { useRecordingDetail } from './useRecordingDetail';
 import { MediaPlayer } from './MediaPlayer';
 import { TranscriptionSection } from './TranscriptionSection';
-import { RecordingMetadata } from './RecordingMetadata';
 import { RecordingHeader } from './RecordingHeader';
 import { Recording } from '@/types/recording';
 import { RecordingDetailLoading } from './RecordingDetailLoading';
@@ -15,44 +14,48 @@ interface RecordingDetailPageProps {
 
 export default function RecordingDetailPage({
 	initialRecording,
-}: RecordingDetailPageProps) {
+  }: RecordingDetailPageProps) {
 	const {
-		recording,
-		mediaUrl,
-		isTranscribing,
-		mediaRef,
-		handleTranscribe,
-		isLoadingUrl,
+	  recording,
+	  mediaUrl,
+	  isTranscribing,
+	  mediaRef,
+	  segments,
+	  handleTranscribe,
+	  isLoadingUrl,
+	  refreshSegments,
 	} = useRecordingDetail(initialRecording);
-
+  
 	if (isLoadingUrl) {
-		return <RecordingDetailLoading />;
+	  return <RecordingDetailLoading />;
 	}
-
+  
 	return (
-		<div className="min-h-[calc(100vh-64px)] bg-component-background p-8">
-			<div className="max-w-4xl mx-auto">
-				<RecordingHeader
-					title={recording.title}
-					canTranscribe={!recording.transcription}
-					onTranscribe={handleTranscribe}
-					isTranscribing={isTranscribing}
-				/>
-
-				<Card className="mb-8">
-					<RecordingMetadata recording={recording} />
-					<MediaPlayer
-						mediaUrl={mediaUrl}
-						mediaRef={mediaRef}
-						fileType={recording.file_type}
-					/>
-				</Card>
-
-				<TranscriptionSection
-					transcription={recording.transcription}
-					mediaRef={mediaRef}
-				/>
-			</div>
+	  <div className="min-h-[calc(100vh-64px)] bg-component-background p-8">
+		<div className="max-w-4xl mx-auto">
+		  <RecordingHeader
+			title={recording.title}
+			canTranscribe={!recording.transcription}
+			onTranscribe={handleTranscribe}
+			isTranscribing={isTranscribing}
+		  />
+  
+		  <Card className="mb-8">
+			<MediaPlayer
+			  mediaUrl={mediaUrl}
+			  mediaRef={mediaRef}
+			  fileType={recording.file_type}
+			/>
+		  </Card>
+  
+		  <TranscriptionSection
+          segments={segments}
+          mediaRef={mediaRef}
+          recordingId={recording.id}
+          onRefreshSegments={refreshSegments}
+        />
 		</div>
+	  </div>
 	);
-}
+  }
+  
