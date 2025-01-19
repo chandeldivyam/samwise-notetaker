@@ -59,9 +59,9 @@ export function useRecordingDetail(initialRecording: Recording) {
 				throw new Error(
 					fetchError || 'Failed to fetch updated recording'
 				);
-			
-			const { data: transcriptionSegments } = await getTranscriptionSegments(recording.id);
 
+			const { data: transcriptionSegments } =
+				await getTranscriptionSegments(recording.id);
 
 			setRecording(updatedRecording);
 			setSegments(transcriptionSegments || []);
@@ -77,28 +77,27 @@ export function useRecordingDetail(initialRecording: Recording) {
 
 	useEffect(() => {
 		if (recording.transcription_status === 'completed') {
-		  getTranscriptionSegments(recording.id)
-			.then(({ data }) => {
-			  setSegments(data || []);
-			})
-			.catch((error) => {
-			  console.error('Error fetching segments:', error);
-			  messageApi.error('Failed to fetch transcription segments');
-			});
+			getTranscriptionSegments(recording.id)
+				.then(({ data }) => {
+					setSegments(data || []);
+				})
+				.catch((error) => {
+					console.error('Error fetching segments:', error);
+					messageApi.error('Failed to fetch transcription segments');
+				});
 		}
-	  }, [recording.id, recording.transcription_status]);
+	}, [recording.id, recording.transcription_status]);
 
-	  const refreshSegments = async () => {
+	const refreshSegments = async () => {
 		try {
-		  const { data } = await getTranscriptionSegments(recording.id);
-		  setSegments(data || []);
+			const { data } = await getTranscriptionSegments(recording.id);
+			setSegments(data || []);
 		} catch (error) {
-		  console.error('Error refreshing segments:', error);
-		  messageApi.error('Failed to refresh transcription segments');
+			console.error('Error refreshing segments:', error);
+			messageApi.error('Failed to refresh transcription segments');
 		}
-	  };
-	
-	
+	};
+
 	return {
 		recording,
 		mediaUrl,

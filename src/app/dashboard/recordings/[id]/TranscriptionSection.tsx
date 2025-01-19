@@ -1,178 +1,237 @@
+// src/app/dashboard/recordings/[id]/TranscriptionSection.tsx
 import { useMemo, useState, useEffect } from 'react';
-import { Typography, Card, Select, Tooltip } from 'antd';
+import { Typography, Input, Button, Tooltip } from 'antd';
+import { SearchOutlined, CopyOutlined } from '@ant-design/icons';
 import { TranscriptionSegment, Speaker } from '@/types/transcription';
 import { TranscriptionSentence } from './TranscriptionSentence';
 import { Person } from '@/types/person';
 import { getPeople } from '@/lib/actions/people';
 import { updateAllSegmentsByOriginalSpeaker } from '@/lib/actions/transcription-segments';
 import { useMessage } from '@/utils/message';
+import { formatTime } from '@/utils/format';
+import { SpeakerNavigation } from './SpeakerNavigation';
+import { SpeakerManagement } from './SpeakerManagement';
 
-const { Title, Paragraph } = Typography;
+const { Title } = Typography;
 
 interface TranscriptionSectionProps {
-  segments?: TranscriptionSegment[];
-  recordingId: string;
-  mediaRef: React.RefObject<HTMLVideoElement | HTMLAudioElement>;
-  onRefreshSegments: () => Promise<void>;
+	segments?: TranscriptionSegment[];
+	recordingId: string;
+	mediaRef: React.RefObject<HTMLVideoElement | HTMLAudioElement>;
+	onRefreshSegments: () => Promise<void>;
 }
 
-// Helper function to format time in MM:SS format
-const formatTime = (seconds: number): string => {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.floor(seconds % 60);
-  return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-};
-
 export function TranscriptionSection({
-  segments,
-  recordingId,
-  mediaRef,
-  onRefreshSegments,
+	segments,
+	recordingId,
+	mediaRef,
+	onRefreshSegments,
 }: TranscriptionSectionProps) {
-  const [people, setPeople] = useState<Person[]>([]);
-  const messageApi = useMessage();
+	const [people, setPeople] = useState<Person[]>([]);
+	const [searchQuery, setSearchQuery] = useState('');
+	const [currentSpeaker, setCurrentSpeaker] = useState<number>();
+	const messageApi = useMessage();
 
-  useEffect(() => {
-    getPeople().then(({ data }) => {
-      if (data) setPeople(data);
-    });
-  }, []);
+	useEffect(() => {
+		getPeople().then(({ data }) => {
+			if (data) setPeople(data);
+		});
+	}, []);
 
-  // Sort segments chronologically and identify unique speakers
-  const { sortedSegments, uniqueSpeakers } = useMemo(() => {
-    if (!segments?.length) return { sortedSegments: [], uniqueSpeakers: new Map() };
+	const { sortedSegments, uniqueSpeakers } = useMemo(() => {
+		if (!segments?.length)
+			return { sortedSegments: [], uniqueSpeakers: new Map() };
 
-    // Sort segments by start time
-    const sorted = [...segments].sort((a, b) => a.start_time - b.start_time);
-    
-    // Create map of unique speakers
-    const speakers = new Map<string, Speaker>();
-    segments.forEach(segment => {
-      const key = `${segment.original_speaker_number}`;
-      if (!speakers.has(key)) {
-        speakers.set(key, {
-          original_speaker_number: segment.original_speaker_number,
-          person_id: segment.person_id,
-          speaker_label: segment.speaker_label
-        });
-      }
-    });
+		const sorted = [...segments].sort(
+			(a, b) => a.start_time - b.start_time
+		);
+		const speakers = new Map<string, Speaker>();
 
-    return { sortedSegments: sorted, uniqueSpeakers: speakers };
-  }, [segments]);
+		segments.forEach((segment) => {
+			const key = `${segment.original_speaker_number}`;
+			if (!speakers.has(key)) {
+				speakers.set(key, {
+					original_speaker_number: segment.original_speaker_number,
+					person_id: segment.person_id,
+					speaker_label: segment.speaker_label,
+				});
+			}
+		});
 
-  // Group consecutive segments by the same speaker
-  const groupedSegments = useMemo(() => {
-    const groups: TranscriptionSegment[][] = [];
-    let currentGroup: TranscriptionSegment[] = [];
+		return { sortedSegments: sorted, uniqueSpeakers: speakers };
+	}, [segments]);
 
-    sortedSegments.forEach((segment, index) => {
-      if (index === 0) {
-        currentGroup = [segment];
-      } else {
-        const previousSegment = sortedSegments[index - 1];
-        const timeDifference = segment.start_time - previousSegment.end_time;
-        const sameSpeaker = segment.original_speaker_number === previousSegment.original_speaker_number;
+	const filteredSegments = useMemo(() => {
+		return sortedSegments.filter((segment) => {
+			const matchesSearch = searchQuery
+				? segment.text.toLowerCase().includes(searchQuery.toLowerCase())
+				: true;
+			const matchesSpeaker =
+				currentSpeaker !== undefined
+					? segment.original_speaker_number === currentSpeaker
+					: true;
+			return matchesSearch && matchesSpeaker;
+		});
+	}, [sortedSegments, searchQuery, currentSpeaker]);
 
-        // Start a new group if:
-        // 1. Different speaker, or
-        // 2. Same speaker but gap is more than 2 seconds
-        if (!sameSpeaker || timeDifference > 2) {
-          if (currentGroup.length > 0) {
-            groups.push(currentGroup);
-          }
-          currentGroup = [segment];
-        } else {
-          currentGroup.push(segment);
-        }
-      }
+	const groupedSegments = useMemo(() => {
+		const groups: TranscriptionSegment[][] = [];
+		let currentGroup: TranscriptionSegment[] = [];
 
-      // Push the last group
-      if (index === sortedSegments.length - 1 && currentGroup.length > 0) {
-        groups.push(currentGroup);
-      }
-    });
+		filteredSegments.forEach((segment, index) => {
+			if (index === 0) {
+				currentGroup = [segment];
+			} else {
+				const previousSegment = filteredSegments[index - 1];
+				const timeDifference =
+					segment.start_time - previousSegment.end_time;
+				const sameSpeaker =
+					segment.original_speaker_number ===
+					previousSegment.original_speaker_number;
 
-    return groups;
-  }, [sortedSegments]);
+				if (!sameSpeaker || timeDifference > 2) {
+					if (currentGroup.length > 0) {
+						groups.push(currentGroup);
+					}
+					currentGroup = [segment];
+				} else {
+					currentGroup.push(segment);
+				}
+			}
 
-  const handleSpeakerUpdate = async (originalSpeakerNumber: number, personId: string | null) => {
-    try {
-      const person = people.find(p => p.id === personId);
-      const speakerLabel = person ? person.name : `Speaker ${originalSpeakerNumber}`;
-      
-      await updateAllSegmentsByOriginalSpeaker(recordingId, originalSpeakerNumber, personId, speakerLabel);
-      await onRefreshSegments();
-      messageApi.success('Speaker updated successfully');
-    } catch (error) {
-		console.error(error);
-      messageApi.error('Failed to update speaker');
-    }
-  };
+			if (
+				index === filteredSegments.length - 1 &&
+				currentGroup.length > 0
+			) {
+				groups.push(currentGroup);
+			}
+		});
 
-  if (!segments?.length) return null;
+		return groups;
+	}, [filteredSegments]);
 
-  return (
-    <Card className="mt-8">
-      <Title level={3}>Transcription</Title>
-      
-      {/* Speaker Management Section */}
-      <div className="mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {Array.from(uniqueSpeakers.values()).map((speaker) => (
-            <Select
-              key={speaker.original_speaker_number}
-              className="w-full"
-              placeholder="Select speaker"
-              value={speaker.person_id}
-              onChange={(personId) => handleSpeakerUpdate(speaker.original_speaker_number, personId)}
-              options={[
-                { label: speaker.speaker_label, value: null },
-                ...people.map((person) => ({
-                  label: person.name,
-                  value: person.id,
-                }))
-              ]}
-            />
-          ))}
-        </div>
-      </div>
+	const handleSpeakerUpdate = async (
+		originalSpeakerNumber: number,
+		personId: string | null
+	) => {
+		try {
+			const person = people.find((p) => p.id === personId);
+			const speakerLabel = person
+				? person.name
+				: `Speaker ${originalSpeakerNumber}`;
 
-      {/* Transcription Content */}
-      <div className="overflow-y-auto max-h-[600px] space-y-4">
-        {groupedSegments.map((group, groupIndex) => {
-          const firstSegment = group[0];
-          const startTime = formatTime(firstSegment.start_time);
-          const endTime = formatTime(group[group.length - 1].end_time);
-          
-          return (
-            <div key={groupIndex} className="border-l-4 pl-4" style={{ borderColor: `hsl(${firstSegment.original_speaker_number * 137.508}deg 70% 45%)` }}>
-              <div className="flex items-center gap-2 mb-2">
-                <Tooltip title={`${startTime} - ${endTime}`}>
-                  <span className="text-sm text-text-secondary">
-                    {startTime}
-                  </span>
-                </Tooltip>
-                <span className="font-semibold text-text-primary">
-                  {firstSegment.speaker_label}
-                </span>
-              </div>
-              <Paragraph className="mb-0">
-                {group.map((segment) => (
-                  <TranscriptionSentence
-                    key={segment.id}
-                    sentence={{
-                      text: segment.text,
-                      start: segment.start_time,
-                    }}
-                    mediaRef={mediaRef}
-                  />
-                ))}
-              </Paragraph>
-            </div>
-          );
-        })}
-      </div>
-    </Card>
-  );
+			await updateAllSegmentsByOriginalSpeaker(
+				recordingId,
+				originalSpeakerNumber,
+				personId,
+				speakerLabel
+			);
+			await onRefreshSegments();
+			messageApi.success('Speaker updated successfully');
+		} catch (error) {
+			console.error(error);
+			messageApi.error('Failed to update speaker');
+		}
+	};
+
+	const handleCopyTranscript = () => {
+		const transcript = groupedSegments
+			.map((group) => {
+				const speaker = group[0].speaker_label;
+				const text = group.map((segment) => segment.text).join(' ');
+				return `${speaker}: ${text}`;
+			})
+			.join('\n\n');
+
+		navigator.clipboard.writeText(transcript);
+		messageApi.success('Transcript copied to clipboard');
+	};
+
+	if (!segments?.length) return null;
+
+	return (
+		<div className="flex flex-col h-full">
+			<div className="flex justify-between items-center mb-4">
+				<Title level={3} className="mb-0">
+					Transcription
+				</Title>
+				<Button icon={<CopyOutlined />} onClick={handleCopyTranscript}>
+					Copy Transcript
+				</Button>
+			</div>
+
+			<SpeakerManagement
+				speakers={Array.from(uniqueSpeakers.values())}
+				people={people}
+				onSpeakerUpdate={handleSpeakerUpdate}
+			/>
+
+			<div className="px-4 py-3 border-t border-border-color">
+				<Input
+					prefix={<SearchOutlined />}
+					placeholder="Search transcription..."
+					value={searchQuery}
+					onChange={(e) => setSearchQuery(e.target.value)}
+					allowClear
+				/>
+			</div>
+
+			<div className="flex flex-1 overflow-hidden">
+				<SpeakerNavigation
+					speakers={Array.from(uniqueSpeakers.values())}
+					currentSpeaker={currentSpeaker}
+					onSpeakerClick={(speakerNumber) =>
+						setCurrentSpeaker(
+							currentSpeaker === speakerNumber
+								? undefined
+								: speakerNumber
+						)
+					}
+				/>
+
+				<div className="flex-1 overflow-y-auto p-4 space-y-4">
+					{groupedSegments.map((group, groupIndex) => {
+						const firstSegment = group[0];
+						const startTime = firstSegment.start_time;
+						const endTime = group[group.length - 1].end_time;
+
+						return (
+							<div
+								key={groupIndex}
+								className="border-l-4 pl-4"
+								style={{
+									borderColor: `hsl(${firstSegment.original_speaker_number * 137.508}deg 70% 45%)`,
+								}}
+							>
+								<div className="flex items-center gap-2 mb-2">
+									<Tooltip
+										title={`${formatTime(startTime)} - ${formatTime(endTime)}`}
+									>
+										<span className="text-sm text-text-secondary">
+											{formatTime(startTime)}
+										</span>
+									</Tooltip>
+									<span className="font-semibold text-text-primary">
+										{firstSegment.speaker_label}
+									</span>
+								</div>
+								<div className="text-text-primary">
+									{group.map((segment) => (
+										<TranscriptionSentence
+											key={segment.id}
+											sentence={{
+												text: segment.text,
+												start: segment.start_time,
+											}}
+											mediaRef={mediaRef}
+										/>
+									))}
+								</div>
+							</div>
+						);
+					})}
+				</div>
+			</div>
+		</div>
+	);
 }

@@ -5,7 +5,6 @@ import { createClient } from '@/utils/supabase/server';
 import { getS3SignedUrl } from './s3';
 import { processDeepgramTranscription } from './transcription-segments';
 
-
 export async function transcribeRecording(recordingId: string) {
 	try {
 		const supabase = await createClient();

@@ -1,14 +1,24 @@
+// src/app/dashboard/recordings/[id]/RecordingDetailLoading.tsx
 export function RecordingDetailLoading() {
 	return (
 		<div className="min-h-[calc(100vh-64px)] bg-component-background p-8">
-			<div className="max-w-4xl mx-auto">
-				<div className="animate-pulse">
-					<div className="h-8 bg-foreground rounded w-1/3 mb-8" />
-					<div className="h-64 bg-foreground rounded mb-8" />
-					<div className="space-y-4">
-						<div className="h-4 bg-foreground rounded w-3/4" />
-						<div className="h-12 bg-foreground rounded w-1/2" />
-						<div className="h-8 bg-foreground rounded w-2/3" />
+			<div className="max-w-6xl mx-auto">
+				<div className="bg-component-background rounded-lg shadow-sm p-6 mb-6">
+					<div className="animate-pulse">
+						<div className="h-8 bg-text-secondary rounded w-1/3 mb-4" />
+						<div className="flex space-x-4">
+							<div className="h-4 bg-text-secondary rounded w-24" />
+							<div className="h-4 bg-text-secondary rounded w-24" />
+							<div className="h-4 bg-text-secondary rounded w-24" />
+						</div>
+					</div>
+				</div>
+
+				<div className="grid gap-6 grid-cols-1">
+					<div className="bg-component-background rounded-lg shadow-sm p-6">
+						<div className="animate-pulse">
+							<div className="h-64 bg-text-secondary rounded" />
+						</div>
 					</div>
 				</div>
 			</div>
