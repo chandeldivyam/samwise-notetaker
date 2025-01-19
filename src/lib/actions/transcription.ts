@@ -3,6 +3,7 @@
 
 import { createClient } from '@/utils/supabase/server';
 import { getS3SignedUrl } from './s3';
+import { processDeepgramTranscription } from './transcription-segments';
 
 export async function transcribeRecording(recordingId: string) {
 	try {
@@ -67,6 +68,7 @@ export async function transcribeRecording(recordingId: string) {
 			.eq('id', recordingId);
 
 		if (updateError) throw updateError;
+		await processDeepgramTranscription(recording.id, result);
 
 		return { success: true };
 	} catch (error) {
