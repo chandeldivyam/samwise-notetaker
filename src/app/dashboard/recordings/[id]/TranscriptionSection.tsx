@@ -1,11 +1,9 @@
 // src/app/dashboard/recordings/[id]/TranscriptionSection.tsx
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { Typography, Input, Button, Tooltip } from 'antd';
 import { SearchOutlined, CopyOutlined } from '@ant-design/icons';
 import { TranscriptionSegment, Speaker } from '@/types/transcription';
 import { TranscriptionSentence } from './TranscriptionSentence';
-import { Person } from '@/types/person';
-import { getPeople } from '@/lib/actions/people';
 import { updateAllSegmentsByOriginalSpeaker } from '@/lib/actions/transcription-segments';
 import { useMessage } from '@/utils/message';
 import { formatTime } from '@/utils/format';
@@ -27,16 +25,9 @@ export function TranscriptionSection({
 	mediaRef,
 	onRefreshSegments,
 }: TranscriptionSectionProps) {
-	const [people, setPeople] = useState<Person[]>([]);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [currentSpeaker, setCurrentSpeaker] = useState<number>();
 	const messageApi = useMessage();
-
-	useEffect(() => {
-		getPeople().then(({ data }) => {
-			if (data) setPeople(data);
-		});
-	}, []);
 
 	const { sortedSegments, uniqueSpeakers } = useMemo(() => {
 		if (!segments?.length)
@@ -112,14 +103,10 @@ export function TranscriptionSection({
 
 	const handleSpeakerUpdate = async (
 		originalSpeakerNumber: number,
-		personId: string | null
+		personId: string | null,
+		speakerLabel: string
 	) => {
 		try {
-			const person = people.find((p) => p.id === personId);
-			const speakerLabel = person
-				? person.name
-				: `Speaker ${originalSpeakerNumber}`;
-
 			await updateAllSegmentsByOriginalSpeaker(
 				recordingId,
 				originalSpeakerNumber,
@@ -162,7 +149,6 @@ export function TranscriptionSection({
 
 			<SpeakerManagement
 				speakers={Array.from(uniqueSpeakers.values())}
-				people={people}
 				onSpeakerUpdate={handleSpeakerUpdate}
 			/>
 
